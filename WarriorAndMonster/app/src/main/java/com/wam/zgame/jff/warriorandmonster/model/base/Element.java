@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.wam.zgame.jff.warriorandmonster.tools.B;
+import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.List;
  * Created by zhaoyuntao on 2018/5/18.
  */
 
-public abstract class Element extends GameObject implements Comparable {
+public abstract class Element extends GameObject  {
 
     //底部中心的x坐标
     protected float x;
@@ -77,14 +78,7 @@ public abstract class Element extends GameObject implements Comparable {
         list = new ArrayList<>();
     }
 
-    //比较
-    @Override
-    public int compareTo(Object o) {
-        if (o instanceof Element) {
-            return (((Element) o).y - this.y) > 0 ? -1 : 1;
-        }
-        return -1;
-    }
+
 
 
     /**
@@ -111,12 +105,12 @@ public abstract class Element extends GameObject implements Comparable {
 
     protected ZBitmap getCurrentBitmap() {
         //计算动作--------------------------------------
-        int index=-1;
+        int index = -1;
         //获取当前应该执行的一连串动作的数组
         if (this.pose_now == null) {
-            index=0;
-        }else{
-            index=pose_now.getPicIndex();
+            index = 0;
+        } else {
+            index = pose_now.getPicIndex();
         }
         this.pose_now = list.get(index);
         //获取该图片下标
@@ -169,71 +163,74 @@ public abstract class Element extends GameObject implements Comparable {
         return bitmap_current;
     }
 
-    @Override
-    public void roll() {
-
-    }
-
     /**
      * 绘制
      *
      * @param canvas
      */
     public void draw(Canvas canvas) {
+        S.s("ele draw");
         if (pictures == null || pose_now == null) {
             return;
         }
         ZBitmap bitmap_current = getCurrentBitmap();
-        float left_real = 0;
-        float right_real = 0;
-        float top_real = 0;
-        float bottom_real = 0;
-        int w_pic = bitmap_current.getW();
-        int h_pic = bitmap_current.getH();
-        //如果朝向左边
-        if (direction == direction_left) {
-            //左边界等于中心点坐标减去前边范围
-            left = x - range_x_forward_pic * percent_real;
-            //右边界等于中心点坐标加上背后范围
-            right = x + range_x_back_pic * percent_real;
-            //左右翻转图片
-            bitmap_current.setBitmap(B.overTurnBitmap(bitmap_current.getBitmap()));
+        if (bitmap_current != null) {
+            float left_real = 0;
+            float right_real = 0;
+            float top_real = 0;
+            float bottom_real = 0;
+            int w_pic = bitmap_current.getW();
+            int h_pic = bitmap_current.getH();
+            //如果朝向左边
+            if (direction == direction_left) {
+                //左边界等于中心点坐标减去前边范围
+                left = x - range_x_forward_pic * percent_real;
+                //右边界等于中心点坐标加上背后范围
+                right = x + range_x_back_pic * percent_real;
+                //左右翻转图片
+                bitmap_current.setBitmap(B.overTurnBitmap(bitmap_current.getBitmap()));
 
-            //计算实际范围
-            left_real = x - range_x_forward_real;
-            right_real = x + range_x_back_real;
+                //计算实际范围
+                left_real = x - range_x_forward_real;
+                right_real = x + range_x_back_real;
 
-        } else if (direction == direction_right) {
-            //如果朝向右边,则左边界等于中心点坐标加上背后范围
-            left = x + range_x_back_pic * percent_real;
-            //右边界等于中心点坐标减去前面范围
-            right = x - range_x_forward_pic * percent_real;
+            } else if (direction == direction_right) {
+                //如果朝向右边,则左边界等于中心点坐标加上背后范围
+                left = x + range_x_back_pic * percent_real;
+                //右边界等于中心点坐标减去前面范围
+                right = x - range_x_forward_pic * percent_real;
 
-            //计算实际范围
-            left_real = x - range_x_back_real;
-            right_real = x + range_x_forward_real;
+                //计算实际范围
+                left_real = x - range_x_back_real;
+                right_real = x + range_x_forward_real;
+            }
+            Paint p = new Paint();
+            Rect rect_pic = new Rect();
+            rect_pic.set(0, 0, w_pic, h_pic);
+
+            Rect rect_draw = new Rect();
+            rect_draw.set((int) left, (int) top, (int) right, (int) bottom);
+            canvas.drawBitmap(bitmap_current.getBitmap(), rect_pic, rect_draw, p);
+
+            //元素朝向左右不影响上下的边界
+            top_real = y - (range_y_top_real + range_y_bottom_real) * percent_real;
+            bottom_real = y;
+            //实体范围边框绘制的区域
+            Rect rect_range = new Rect();
+            rect_range.set((int) left_real, (int) top_real, (int) right_real, (int) bottom_real);
+            //绘制实体范围边框--------------------------------
+
+            p.setAntiAlias(true);
+            p.setColor(Color.RED);
+            p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(1);
+            canvas.drawRect(rect_range, p);
+        } else {
+            Paint p = new Paint();
+            p.setColor(Color.RED);
+            canvas.drawCircle(x, y, 30, p);
         }
-        Paint p = new Paint();
-        Rect rect_pic = new Rect();
-        rect_pic.set(0, 0, w_pic, h_pic);
 
-        Rect rect_draw = new Rect();
-        rect_draw.set((int) left, (int) top, (int) right, (int) bottom);
-        canvas.drawBitmap(bitmap_current.getBitmap(), rect_pic, rect_draw, p);
-
-        //元素朝向左右不影响上下的边界
-        top_real = y - (range_y_top_real + range_y_bottom_real) * percent_real;
-        bottom_real = y;
-        //实体范围边框绘制的区域
-        Rect rect_range = new Rect();
-        rect_range.set((int) left_real, (int) top_real, (int) right_real, (int) bottom_real);
-        //绘制实体范围边框--------------------------------
-
-        p.setAntiAlias(true);
-        p.setColor(Color.RED);
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(1);
-        canvas.drawRect(rect_range, p);
 
     }
 

@@ -1,13 +1,16 @@
 package com.wam.zgame.jff.warriorandmonster.model.base;
 
 
+import android.graphics.Canvas;
+
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
+import com.wam.zgame.jff.warriorandmonster.tools.S;
 
 /**
  * Created by zhaoyuntao on 2018/5/16.
  */
 
-public class Camera {
+public class Camera extends  GameObject{
     //取景框大小
     private float w_visual, h_visual;
     private float w_visual_last, h_visual_last;
@@ -99,6 +102,7 @@ public class Camera {
         lock = false;
     }
 
+    @Override
     public void roll() {
 
         //如果没有移动过,则不需要计算
@@ -119,7 +123,6 @@ public class Camera {
             //确保x,y在地图内部
             if (x_creature >= 0 && x_creature <= w_room) {
                 x_virsual_tmp = x_creature;
-
             }
             if (y_creature >= 0 && y_creature <= h_room) {
                 y_virsual_tmp = y_creature;
@@ -162,6 +165,10 @@ public class Camera {
         this.y_virsual = y_virtual;
         this.x_virsual_last = this.x_virsual;
         this.y_virsual_last = this.y_virsual;
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
     }
 
 

@@ -11,6 +11,7 @@ import com.wam.zgame.jff.warriorandmonster.controller.GameColor;
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
 import com.wam.zgame.jff.warriorandmonster.tools.B;
 import com.wam.zgame.jff.warriorandmonster.tools.GapSizeManager;
+import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.SizeManager;
 import com.wam.zgame.jff.warriorandmonster.tools.TextSizeManager;
 
@@ -23,6 +24,7 @@ public class Player extends Creature {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        S.s("player draw --------");
         Paint p=new Paint();
         //绘制名称------------------------
         String content = "Lv." + level + " " + name;

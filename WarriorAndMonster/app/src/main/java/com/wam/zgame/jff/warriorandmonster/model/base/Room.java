@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
+import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
@@ -17,16 +18,13 @@ import java.util.List;
  * Created by zhaoyuntao on 2017/9/2.
  */
 
-public class Room extends Element {
+public class Room extends GameObject {
     //room id, 用来定位房间
     private int id;
     //房间属性
     private int state = TOWN;
     public static final int TOWN = 0;
     public static final int DUNGEONS = 1;
-
-    //所有元素
-    private List<Creature> list_creature;
 
     //入口
     private List<Door> list_doors;
@@ -52,29 +50,16 @@ public class Room extends Element {
     //打击队列
     private List<Attack> list_attack;
 
-    //取景框
-    private Camera camera;
-
-
     public Room(int state) {
         this.state = state;
         this.list_attack = new ArrayList<>();
-        this.list_creature = new ArrayList<>();
+
         this.list_doors = new ArrayList<>();
     }
 
-    public void addCamera(Camera camera) {
-        this.camera = camera;
-    }
 
-    /**
-     * 向房间内添加元素
-     *
-     * @param hero
-     */
-    public void addCreature(Creature hero) {
-        list_creature.add(hero);
-    }
+
+
 
     /**
      * 添加打击
@@ -85,19 +70,7 @@ public class Room extends Element {
         list_attack.add(attack);
     }
 
-    /**
-     * 战场是否清零
-     */
-    public boolean isMonsterClear() {
-        boolean isMonsterClear = false;
-        for (int i = 0; i < list_creature.size(); i++) {
-            Creature creature = list_creature.get(i);
-            if (!creature.isFriend()) {
-                return false;
-            }
-        }
-        return true;
-    }
+
 
     @Override
     public void roll() {
@@ -106,8 +79,7 @@ public class Room extends Element {
             Door door = list_doors.get(i);
             door.roll();
         }
-        //重新排序地图中的元素
-        Collections.sort(list_creature);
+
 //        //
 //        for (Creature monster : list_creature) {
 //            for (Attack attack : list_attack) {
@@ -121,12 +93,10 @@ public class Room extends Element {
 //            }
 //            monster.roll();
 //        }
+
     }
 
-    @Override
     public void draw(Canvas canvas) {
-        S.s("55555555");
-
         Bitmap bitmap_floor = null;
         if (zbitmap_floor != null) {
             bitmap_floor = zbitmap_floor.getBitmap();
@@ -140,14 +110,14 @@ public class Room extends Element {
                 w_bitmap = bitmap_floor.getWidth();
                 h_bitmap = bitmap_floor.getHeight();
             }
-            if (camera != null) {
+            if (world != null) {
+                Camera camera=world.getCamera();
                 float[] visual = camera.getVisual();
                 left = visual[0] / w_room * w_bitmap;
                 top = visual[1] / w_room * w_bitmap;
                 right = visual[2] / h_room * h_bitmap;
                 bottom = visual[3] / h_room * h_bitmap;
             } else {
-                S.s("取景框为空,默认全屏绘制");
                 left = 0;
                 top = 0;
                 right = w_bitmap;
@@ -162,11 +132,7 @@ public class Room extends Element {
             Paint p = new Paint();
             canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
         }
-        S.s("1222222222");
 
-        for (Creature monster : list_creature) {
-            monster.draw(canvas);
-        }
     }
 
 

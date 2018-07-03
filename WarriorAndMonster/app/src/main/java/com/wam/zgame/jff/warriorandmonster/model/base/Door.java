@@ -13,10 +13,6 @@ public class Door extends Element {
     private int range_x, range_y;
     //是否可以通过
     private boolean open;
-    //自身id
-    private int id;
-    //当前门所在的房间
-    private Room room_current;
     //当前门所在的房间的id
     private int nextRoomId;
 
@@ -26,28 +22,14 @@ public class Door extends Element {
 
     @Override
     public void roll() {
-        if (room_current.isMonsterClear()) {
-            setOpen(open);
-        } else {
-            setOpen(false);
-        }
+
     }
 
 
 
     @Override
     public void draw(Canvas canvas) {
-        if (open) {
 
-        } else {
-
-        }
-    }
-    /**
-     * 通过此门
-     */
-    private void pass() {
-        room_current.leave(this);
     }
     //---------------------------------------
 
@@ -71,21 +53,6 @@ public class Door extends Element {
         return open;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Room getRoom_current() {
-        return room_current;
-    }
-
-    public void setRoom_current(Room room_current) {
-        this.room_current = room_current;
-    }
 
     public void setNextRoomId(int nextRoomId) {
         this.nextRoomId = nextRoomId;

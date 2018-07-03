@@ -16,6 +16,7 @@ import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
 import com.wam.zgame.jff.warriorandmonster.model.base.Element;
 import com.wam.zgame.jff.warriorandmonster.model.base.Room;
+import com.wam.zgame.jff.warriorandmonster.model.base.World;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.Sleeper;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
@@ -31,10 +32,10 @@ public class Window_main extends View implements Runnable {
 
     private boolean flag = true;
     private Thread thread;
-    private Room room;
+    private World  world;
 
-    public void addElement(Room room) {
-        this.room = room;
+    public void addWorld(World world) {
+        this.world = world;
     }
 
     private final Sleeper sleeper_draw = new Sleeper();
@@ -67,7 +68,9 @@ public class Window_main extends View implements Runnable {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-            room.draw(canvas);
+        if(world!=null) {
+            world.draw(canvas);
+        }
         Paint p = new Paint();
         p.setTextSize(20);
         p.setColor(Color.BLACK);
@@ -98,16 +101,6 @@ public class Window_main extends View implements Runnable {
         while (flag) {
             long time_start = System.currentTimeMillis();
             flush_back();
-            if (!sleeper_draw.flag) {
-                synchronized (sleeper_draw) {
-                    try {
-                        sleeper_draw.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                }
-            }
             long time_end = System.currentTimeMillis();
             long during = time_end - time_start;
             if (during < (1000 / GameInfo.frame_draw)) {//限帧操作

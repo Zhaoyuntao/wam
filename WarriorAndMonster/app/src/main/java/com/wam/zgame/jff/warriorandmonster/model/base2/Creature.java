@@ -1,9 +1,12 @@
 package com.wam.zgame.jff.warriorandmonster.model.base2;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 import com.wam.zgame.jff.warriorandmonster.model.base.Element;
 import com.wam.zgame.jff.warriorandmonster.model.base.Pose;
+import com.wam.zgame.jff.warriorandmonster.tools.S;
 
 /**
  * Created by zhaoyuntao on 2018/6/6.
@@ -48,20 +51,12 @@ public class Creature extends Element {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        Pose pose = this.pose;
-        if (pose != null) {
-            int index_pic=pose.getPicIndex();
-
-        }
+        S.s("creature draw");
     }
 
     @Override
     public void roll() {
 
-        Pose pose = this.pose;
-        if (pose != null) {
-            pose.roll();
-        }
     }
 
 

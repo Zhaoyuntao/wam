@@ -1,6 +1,5 @@
 package com.wam.zgame.jff.warriorandmonster.ui;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,6 +16,7 @@ import com.wam.zgame.jff.warriorandmonster.R;
 import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
 import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
+import com.wam.zgame.jff.warriorandmonster.model.base.World;
 import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.T;
@@ -30,7 +30,6 @@ import com.wam.zgame.jff.warriorandmonster.component.FingerControlImpl_control;
 import com.wam.zgame.jff.warriorandmonster.controller.GameCalculator;
 import com.wam.zgame.jff.warriorandmonster.model.base.Room;
 import com.wam.zgame.jff.warriorandmonster.component.Window_main;
-import com.wam.zgame.jff.warriorandmonster.component.Window_skill;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 /**
@@ -42,8 +41,9 @@ public class Activity_window_main extends Activity_base {
     Window_main window_main;
 //    Window_skill window_skill;
     public GameCalculator gameCalculator;
-    public Player hero;
+    public Player player;
     public Room room;
+    public World world;
     private T t;
     private List<Skill> list = new ArrayList<>();
     private Camera camera;
@@ -54,17 +54,27 @@ public class Activity_window_main extends Activity_base {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_window_main);
         initView();
-
-        test_init_pic();
-        test_init_map();
-        test_init_creature();
-        test_init_skill();
+        //初始化world
+        world=new World();
+        window_main.addWorld(world);
+        //初始化room
+        room=RoomLoader.downloadRoom(-1);
+        room.setW_room(3000);
+        room.setH_room(2000);
+        world.addRoom(room);
+        //初始化player
+        player = new Player();
+        player.setX(0);
+        player.setY(0);
+        world.addPlayer(player);
+        //初始化camera
+        camera=new Camera(600,400,3000,2000);
+        camera.lookAt(player);
+        world.addCamera(camera);
 
         initCalCulator();
         initCallBack();
     }
-
-
 
     ZBitmap[] test_pictures;
     ZBitmap[] test_pictures_goblin;
@@ -127,32 +137,6 @@ public class Activity_window_main extends Activity_base {
 
     }
 
-    private void test_init_map() {
-//        ZBitmap bitmap_town = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.town, 0);
-        int w_map = 3000;
-        int h_map = 2000;
-        //初始化测试地图
-        Bitmap bitmap_town = Bitmap.createBitmap(w_map, h_map, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap_town);
-        canvas.drawColor(Color.parseColor("#000000"));
-        int w_index = w_map / 10;
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(3);
-        paint.setAntiAlias(true);
-        for (int i = 0; i < w_map; i += w_index) {
-            for (int j = 0; j < h_map; j += w_index) {
-                canvas.drawLine(i, 0, i, h_map, paint);
-                canvas.drawLine(0, j, w_map, j, paint);
-                canvas.drawText("(" + i + "," + j + ")", i, j - 5, paint);
-            }
-        }
-//        room.setXY(0, zBitmap.h / 3);
-        room=RoomLoader.downloadRoom(-1);
-
-        window_main.addElement(room);
-    }
-
     private void test_init_creature() {
 
         int[] stay_goblin = {0};
@@ -163,7 +147,6 @@ public class Activity_window_main extends Activity_base {
 //        float y = room.h_map_bitmap / 5;
         float range_x_goblin = 140;
         float range_y_goblin = 200;
-
 //        int i = 1;
 //        for (; i > 0; i--) {
 //            Creature monster1 = new Creature(Creature.identity_enemy, x, y, range_x_goblin, range_y_goblin, Creature.state_stay);
@@ -174,7 +157,6 @@ public class Activity_window_main extends Activity_base {
 //            monster1.setPercent_pic(0.5f);
 //            room.list.add(monster1);
 //        }
-//
 //        int[] stay_swordman = {0, 1, 2, 3, 4, 5, 6, 7};
 //        int[] walk_swordman = {8, 9, 10, 11, 12, 13, 14, 15};
 //        int[] run_swordman = {16, 17, 18, 19, 20, 21, 22, 23};
@@ -183,28 +165,6 @@ public class Activity_window_main extends Activity_base {
         int[] run_swordman = {0};
         float range_x = 70;
         float range_y = 120;
-        hero = new Player();
-//        hero.setName("player");
-        room.addCreature(hero);
-        hero.setX(1500);
-        hero.setY(1000);
-        camera=new Camera(600,400,3000,2000);
-        new Thread(new Runnable() {
-            float x,y;
-            @Override
-            public void run() {
-                while(flag){
-                    camera.lookAt(x++,y++);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-
-        room.addCamera(camera);
     }
     boolean flag=true;
 
@@ -215,35 +175,35 @@ public class Activity_window_main extends Activity_base {
         Skill test_skill_attack = new Skill(0);
 //        test_skill_attack.name = "攻击";
 //        test_skill_attack.id = 0;
-//        test_skill_attack.hero = hero;
+//        test_skill_attack.player = player;
 //        test_skill_attack.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_yuangujiyi_ok, 1);
 //        test_skill_attack.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_yuangujiyi_no, 1);
 
         Skill test_skill_jumpback = new Skill(0);
 //        test_skill_jumpback.name = "后跳";
 //        test_skill_jumpback.id = 1;
-//        test_skill_jumpback.hero = hero;
+//        test_skill_jumpback.player = player;
 //        test_skill_jumpback.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_jumpback_ok, 1);
 //        test_skill_jumpback.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_jumpback_no, 1);
 
         Skill test_skill_big = new Skill(10);
 //        test_skill_big.name = "变大";
 //        test_skill_big.id = 2;
-//        test_skill_big.hero = hero;
+//        test_skill_big.player = player;
 //        test_skill_big.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_buquyizhi_ok, 1);
 //        test_skill_big.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_buquyizhi_no, 1);
 
         Skill test_skill_small = new Skill(10);
 //        test_skill_small.name = "变小";
 //        test_skill_small.id = 3;
-//        test_skill_small.hero = hero;
+//        test_skill_small.player = player;
 //        test_skill_small.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_buquyizhi_ok, 1);
 //        test_skill_small.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_buquyizhi_no, 1);
 
         Skill test_skill_addhp = new Skill(25000);
 //        test_skill_addhp.name = "恢复hp";
 //        test_skill_addhp.id = 4;
-//        test_skill_addhp.hero = hero;
+//        test_skill_addhp.player = player;
 //        test_skill_addhp.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_hp_ok, 1);
 //        test_skill_addhp.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_hp_no, 1);
 
@@ -285,33 +245,47 @@ public class Activity_window_main extends Activity_base {
     }
 
     private void initCallBack() {
-        gameCalculator.setCallBack(new GameCalculator.CallBack() {
+//        gameCalculator.addObject(player);
+//        gameCalculator.addObject(room);
+//        for (Skill skill : list) {
+//            gameCalculator.addObject(skill);
+//        }
+//        gameCalculator.addObject(camera);
+        gameCalculator.addObject(world);
+
+        new Thread(new Runnable() {
             @Override
-            public void calculate() {
-                hero.setX(hero.getX()+1);
-                hero.setY(hero.getY()+1);
-                if (hero != null) {
-                    hero.roll();
+            public void run() {
+                while (flag){
+                    player.setX(player.getX()+1);
+                    player.setY(player.getY()+1);
+                    if(player.getX()<0){
+                        player.setX(0);
+                    }else if(player.getX()>room.getW_room()){
+                        player.setX(0);
+                    }
+                    if(player.getY()<0){
+                        player.setY(0);
+                    }else if(player.getY()>room.getH_room()){
+                        player.setY(0);
+                    }
+//                    S.s("x:"+ player.getX()+" y:"+ player.getY());
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                if(camera!=null){
-                    camera.roll();
-                }
-                if (room != null) {//测试阶段先使用单个房间作为测试副本
-                    room.roll();
-                }
-                for (Skill skill : list) {
-                    skill.roll();
-                }
-//                window_skill.flush_back();
             }
-        });
+        }).start();
+
         fingerControl.setCallBack(new FingerControl.CallBack() {
             @Override
             public void send(int x, int y) {
                 S.s(" x : " + x + " y : " + y);
-                if (hero != null) {
-//                    hero.speed_percent_x = (float) x / 100 / 2;
-//                    hero.speed_percent_y = (float) y / 100 / 2;
+                if (player != null) {
+//                    player.speed_percent_x = (float) x / 100 / 2;
+//                    player.speed_percent_y = (float) y / 100 / 2;
                 }
             }
 

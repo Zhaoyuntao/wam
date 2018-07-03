@@ -16,11 +16,6 @@ public class GameCalculator implements Runnable {
     public GameCalculator() {
         init();
     }
-    private CallBack callBack;
-
-    public void setCallBack(CallBack callBack){
-        this.callBack=callBack;
-    }
 
     private  void flush() {
         for(GameObject gameObject:list){
@@ -35,6 +30,10 @@ public class GameCalculator implements Runnable {
         list=new ArrayList<>();
         thread = new Thread(this);
         thread.start();
+    }
+
+    public void addObject(GameObject o){
+        list.add(o);
     }
 
     public void close() {
@@ -77,7 +76,4 @@ public class GameCalculator implements Runnable {
 
     private final Sleeper sleeper_draw = new Sleeper();
 
-    public interface  CallBack{
-        public void calculate();
-    }
 }
