@@ -5,13 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
-import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
-import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,13 +32,13 @@ public class Room extends GameObject {
     private ZBitmap zbitmap_back;
 
     //房间的总虚拟大小
-    private int w_room;
-    private int h_room;
+    private float w_room;
+    private float h_room;
 
     //地板区域的高度
-    private int h_floor;
+    private float h_floor;
     //风景墙区域的高度
-    private int h_wall;
+    private float h_wall;
 
     //camera
     private Camera camera;
@@ -112,11 +108,11 @@ public class Room extends GameObject {
                 h_bitmap = bitmap_floor.getHeight();
             }
             if (camera != null) {
-                float[] visual = camera.getVisual();
-                left = visual[0] / w_room * w_bitmap;
-                top = visual[1] / w_room * w_bitmap;
-                right = visual[2] / h_room * h_bitmap;
-                bottom = visual[3] / h_room * h_bitmap;
+                float[] visual = camera.getVisualRange();
+                left = visual[0] ;
+                top = visual[1];
+                right = visual[2] ;
+                bottom = visual[3] ;
             } else {
                 left = 0;
                 top = 0;
@@ -177,36 +173,35 @@ public class Room extends GameObject {
         this.zbitmap_back = zbitmap_back;
     }
 
-    public int getW_room() {
+    public float getW_room() {
         return w_room;
     }
 
-    public void setW_room(int w_room) {
+    public void setW_room(float w_room) {
         this.w_room = w_room;
     }
 
-    public int getH_room() {
+    public float getH_room() {
         return h_room;
     }
 
-    public void setH_room(int h_room) {
+    public void setH_room(float h_room) {
         this.h_room = h_room;
     }
 
-    public int getH_floor() {
+    public float getH_floor() {
         return h_floor;
     }
 
-    public void setH_floor(int h_floor) {
+    public void setH_floor(float h_floor) {
         this.h_floor = h_floor;
     }
 
-    public int getH_wall() {
+    public float getH_wall() {
         return h_wall;
     }
 
-    public void setH_wall(int h_wall) {
+    public void setH_wall(float h_wall) {
         this.h_wall = h_wall;
     }
-
 }

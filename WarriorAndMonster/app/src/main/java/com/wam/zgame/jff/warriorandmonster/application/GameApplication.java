@@ -24,8 +24,8 @@ public class GameApplication extends Application {
         Display d = windowmanager.getDefaultDisplay();
         Point p = new Point();
         d.getSize(p);
-        GameParams.w_visual = p.y;// 屏幕长（像素）
-        GameParams.h_visual = p.x;// 屏幕宽（像素）
+        GameParams.w_visual = p.x;// 屏幕长（像素）
+        GameParams.h_visual = p.y;// 屏幕宽（像素）
         GameParams.w_px = GameParams.h_visual / 1080f;
 
         //设置名称字体大小

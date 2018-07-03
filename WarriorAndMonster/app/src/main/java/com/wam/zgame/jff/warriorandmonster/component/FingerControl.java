@@ -228,7 +228,7 @@ public class FingerControl extends View {
                 }
                 break;
         }
-        invalidate();
+        postInvalidate();
         return true;
     }
 

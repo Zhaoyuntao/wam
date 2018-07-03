@@ -86,10 +86,10 @@ public class Window_main extends View implements Runnable {
             flush_back();
             long time_end = System.currentTimeMillis();
             long during = time_end - time_start;
-            if (during < (1000 / GameInfo.frame_draw)) {//限帧操作
+            if (during < (1000d / GameInfo.frame_draw)) {//限帧操作
                 try {
                     //如果在规定的执行时间内完成了操作,则多余的时间必须消耗完
-                    Thread.sleep(1000 / GameInfo.frame_draw - during);
+                    Thread.sleep((long) (1000d / GameInfo.frame_draw - during));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     return;

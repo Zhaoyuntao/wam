@@ -24,7 +24,6 @@ public class Player extends Creature {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        S.s("player draw --------");
         Paint p=new Paint();
         //绘制名称------------------------
         String content = "Lv." + level + " " + name;
@@ -114,11 +113,5 @@ public class Player extends Creature {
         p.setColor(Color.BLACK);
         p.setStrokeWidth(w_border_hp);
         canvas.drawRoundRect(rect_hp_all_draw, radius, radius, p);
-    }
-
-    @Override
-    public void roll() {
-        super.roll();
-
     }
 }

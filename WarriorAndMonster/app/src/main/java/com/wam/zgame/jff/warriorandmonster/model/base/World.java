@@ -1,7 +1,9 @@
 package com.wam.zgame.jff.warriorandmonster.model.base;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.support.annotation.NonNull;
+import android.graphics.Paint;
+import android.graphics.Rect;
 
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
@@ -128,16 +130,32 @@ public class World extends GameObject {
 
     @Override
     public void draw(Canvas canvas) {
-        S.s("----------------------------------------------------------------------------------");
+        Bitmap bitmap=Bitmap.createBitmap((int)room.getW_room(),(int)room.getH_room(), Bitmap.Config.ARGB_8888);
+        S.s("w:"+(int)room.getW_room()+" h:"+(int)room.getH_room());
+        Canvas canvas1=new Canvas(bitmap);
+
         if (room != null) {
-            room.draw(canvas);
+            room.draw(canvas1);
         }
         for (GameObject gameObject : list_creature) {
-            gameObject.draw(canvas);
+            gameObject.draw(canvas1);
         }
         if (player != null) {
-            player.draw(canvas);
+            player.draw(canvas1);
         }
+
+        if(camera!=null){
+           Bitmap bitmap1= camera.getVisual(bitmap);
+            Paint p=new Paint();
+            Rect rect=new Rect();
+            rect.set(0,0,bitmap1.getWidth(),bitmap1.getHeight());
+            S.s("w:"+bitmap1.getWidth()+" h:"+bitmap1.getHeight());
+            Rect rect2=new Rect();
+            rect2.set(0,0,canvas.getWidth(),canvas.getHeight());
+            S.s("w:"+canvas.getWidth()+" h:"+canvas.getHeight());
+            canvas.drawBitmap(bitmap1,rect,rect2,p);
+        }
+        bitmap.recycle();
     }
 
 
@@ -145,4 +163,7 @@ public class World extends GameObject {
         return camera;
     }
 
+    public Room getRoom() {
+        return room;
+    }
 }

@@ -1,7 +1,10 @@
 package com.wam.zgame.jff.warriorandmonster.model.base;
 
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
 
@@ -17,6 +20,11 @@ public class Camera extends GameObject {
     //room的大小
     private float w_room;
     private float h_room;
+
+    float left;
+    float top;
+    float right;
+    float bottom;
 
     //当点距离取景框边界小于这个值的时候，要移动取景框
     private float distance_min_x;
@@ -46,15 +54,7 @@ public class Camera extends GameObject {
      *
      * @return
      */
-    public float[] getVisual() {
-        //计算缩放以后的取景框
-        float w_visual_scale = w_visual * percent;
-        float h_visual_scale = h_visual * percent;
-        //计算四周边界
-        float left = x_visual + (w_visual - w_visual_scale) / 2;
-        float top = y_visual + (h_visual - h_visual_scale) / 2;
-        float right = left + w_visual_scale;
-        float bottom = top + h_visual_scale;
+    public float[] getVisualRange() {
         return new float[]{left, top, right, bottom};
     }
 
@@ -110,27 +110,23 @@ public class Camera extends GameObject {
                 x_creature = creature_now.x;
                 y_creature = creature_now.y;
 
+                //如果x坐标超过取景框的右边界
                 if (x_creature > x_visual + (w_visual - distance_min_x)) {
                     x_visual_tmp = x_creature - (w_visual - distance_min_x);
-                } else if (x_creature < (x_visual + distance_min_x)) {
+                } else if (x_creature < x_visual + distance_min_x) {//如果x坐标超过取景框的左边界
                     x_visual_tmp = x_creature - distance_min_x;
                 }
 
+                //如果y坐标超过取景框的下边界
                 if (y_creature > y_visual + (h_visual - distance_min_y)) {
                     y_visual_tmp = y_creature - (h_visual - distance_min_y);
-                } else if (y_creature < (y_visual + distance_min_y)) {
+                } else if (y_creature < (y_visual + distance_min_y)) {//如果y坐标超过取景框的上边界
                     y_visual_tmp = y_creature - distance_min_y;
-                }
-                //确保x,y在地图内部
-                if (x_creature >= 0 && x_creature <= w_room) {
-                    x_visual_tmp = x_creature - w_visual / 2;
-                }
-                if (y_creature >= 0 && y_creature <= h_room) {
-                    y_visual_tmp = y_creature - h_visual / 2;
                 }
             }
         }
 
+        //确保取景框不会跑到地图外面去
         if (x_visual_tmp < 0) {
             x_visual_tmp = 0;
         } else if (x_visual_tmp > (w_room - w_visual)) {
@@ -143,21 +139,34 @@ public class Camera extends GameObject {
         }
 
         //计算边界
-        float margin_left = x_visual_tmp;
-        float margin_right = w_room - x_visual_tmp - w_visual;
-        float margin_top = y_visual_tmp;
-        float margin_bottom = h_room - y_visual_tmp - h_visual;
+        left = x_visual_tmp;
+        right = left + w_visual;
+        top = y_visual_tmp;
+        bottom = top + h_visual;
 
         //赋值
         this.x_visual = x_visual_tmp;
         this.y_visual = y_visual_tmp;
         this.x_visual_last = this.x_visual;
         this.y_visual_last = this.y_visual;
+
+
     }
 
     @Override
     public void draw(Canvas canvas) {
+
     }
 
 
+    public Bitmap getVisual(Bitmap bitmap_src) {
+        Bitmap bitmap = Bitmap.createBitmap((int) w_visual, (int) h_visual, Bitmap.Config.ARGB_8888);
+        Rect rect = new Rect();
+        rect.set((int) left, (int) top, (int) right, (int) bottom);
+        Rect rect2 = new Rect();
+        Canvas canvas1 = new Canvas(bitmap);
+        rect2.set(0, 0, canvas1.getWidth(), canvas1.getHeight());
+        canvas1.drawBitmap(bitmap_src, rect, rect2, new Paint());
+        return bitmap;
+    }
 }

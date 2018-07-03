@@ -6,6 +6,8 @@ import android.graphics.Paint;
 
 import com.wam.zgame.jff.warriorandmonster.model.base.Element;
 import com.wam.zgame.jff.warriorandmonster.model.base.Pose;
+import com.wam.zgame.jff.warriorandmonster.model.base.Room;
+import com.wam.zgame.jff.warriorandmonster.model.base.World;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 
 /**
@@ -33,30 +35,58 @@ public class Creature extends Element {
     protected int id_hatred;
 
     //基础速度
-    protected final float speed = 0;
+    protected float speed_x = 1;
+    protected float speed_y = 1;
+
+    //方向
+    protected int x_direction = 0;
+    protected int y_direction = 0;
 
     //x轴方向基础速度,需要根据基础速度计算
-    protected float speed_percent_x;
+    protected float speed_percent_x = 1;
     //y轴方向基础速度,需要根据基础速度计算
-    protected float speed_percent_y;
+    protected float speed_percent_y = 1;
 
+    protected World world;
 
-
-    protected boolean isFriend=false;
+    protected boolean isFriend = false;
 
     //当前动作
     protected Pose pose;
 
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        S.s("creature draw");
+    }
+
+    public void setWorld(World world) {
+        this.world=world;
     }
 
     @Override
     public void roll() {
-
+        if(world!=null){
+            Room room = world.getRoom();
+            float w_room = room.getW_room();
+            float h_room = room.getH_room();
+            float x_tmp = 0;
+            float y_tmp = 0;
+            direction = x_direction;
+            x_tmp = x + speed_percent_x * speed_x * x_direction;
+            y_tmp = y + speed_percent_y * speed_y * y_direction;
+            if (x_tmp < 0) {
+                x_tmp = 0;
+            } else if (x_tmp > w_room) {
+                x_tmp = w_room;
+            }
+            if (y_tmp < 0) {
+                y_tmp = 0;
+            } else if (y_tmp > h_room) {
+                y_tmp = h_room;
+            }
+            x = x_tmp;
+            y = y_tmp;
+        }
     }
 
 
@@ -117,11 +147,60 @@ public class Creature extends Element {
         float hp_all = getHp_all();
         hp(hp_all * percent);
     }
+
     public boolean isFriend() {
         return isFriend;
     }
 
     public void setFriend(boolean friend) {
         isFriend = friend;
+    }
+
+    public float getSpeed_x() {
+        return speed_x;
+    }
+
+    public void setSpeed_x(float speed_x) {
+        this.speed_x = speed_x;
+    }
+
+    public float getSpeed_y() {
+        return speed_y;
+    }
+
+    public void setSpeed_y(float speed_y) {
+        this.speed_y = speed_y;
+    }
+
+    public int getX_direction() {
+        return x_direction;
+    }
+
+    public void setX_direction(int x_direction) {
+        this.x_direction = x_direction;
+    }
+
+    public int getY_direction() {
+        return y_direction;
+    }
+
+    public void setY_direction(int y_direction) {
+        this.y_direction = y_direction;
+    }
+
+    public float getSpeed_percent_x() {
+        return speed_percent_x;
+    }
+
+    public void setSpeed_percent_x(float speed_percent_x) {
+        this.speed_percent_x = speed_percent_x;
+    }
+
+    public float getSpeed_percent_y() {
+        return speed_percent_y;
+    }
+
+    public void setSpeed_percent_y(float speed_percent_y) {
+        this.speed_percent_y = speed_percent_y;
     }
 }

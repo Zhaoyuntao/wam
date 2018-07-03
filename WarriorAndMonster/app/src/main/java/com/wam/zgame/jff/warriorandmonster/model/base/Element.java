@@ -175,7 +175,6 @@ public abstract class Element extends GameObject  {
      * @param canvas
      */
     public void draw(Canvas canvas) {
-        S.s("ele draw");
         ZBitmap bitmap_current = getCurrentBitmap();
         if (bitmap_current != null) {
             float left_real = 0;
@@ -231,6 +230,7 @@ public abstract class Element extends GameObject  {
         } else {
             Paint p = new Paint();
             p.setColor(Color.RED);
+            p.setAntiAlias(true);
             canvas.drawCircle(x, y, 30, p);
             S.s("==============");
         }

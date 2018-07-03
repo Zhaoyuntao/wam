@@ -39,7 +39,7 @@ import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 public class Activity_window_main extends Activity_base {
     FingerControlImpl_control fingerControl;
     Window_main window_main;
-//    Window_skill window_skill;
+    //    Window_skill window_skill;
     public GameCalculator gameCalculator;
     public Player player;
     public Room room;
@@ -55,10 +55,10 @@ public class Activity_window_main extends Activity_base {
         setContentView(R.layout.activity_window_main);
         initView();
         //初始化world
-        world=new World();
+        world = new World();
         window_main.addWorld(world);
         //初始化room
-        room=RoomLoader.downloadRoom(-1);
+        room = RoomLoader.downloadRoom(-1);
         room.setW_room(3000);
         room.setH_room(2000);
         world.addRoom(room);
@@ -66,40 +66,13 @@ public class Activity_window_main extends Activity_base {
         player = new Player();
         player.setX(50);
         player.setY(50);
+        player.setWorld(world);
         world.addPlayer(player);
         //初始化camera
-        camera=new Camera(600,400,3000,2000);
+        camera = new Camera(1500, 1500 * ((float) GameParams.h_visual / (float) GameParams.w_visual), 3000, 2000);
         camera.lookAt(player);
 //        camera.lookAt(player);
         world.addCamera(camera);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (flag){
-                    if(player!=null){
-                        player.setX(player.getX()+1);
-                        player.setY(player.getY()+1);
-                        if(player.getX()<0){
-                            player.setX(0);
-                        }else if(player.getX()>room.getW_room()){
-                            player.setX(0);
-                        }
-                        if(player.getY()<0){
-                            player.setY(0);
-                        }else if(player.getY()>room.getH_room()){
-                            player.setY(0);
-                        }
-//                    S.s("x:"+ player.getX()+" y:"+ player.getY());
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
 
         initCalCulator();
         initCallBack();
@@ -195,7 +168,8 @@ public class Activity_window_main extends Activity_base {
         float range_x = 70;
         float range_y = 120;
     }
-    boolean flag=true;
+
+    boolean flag = true;
 
     private void test_init_skill() {
 
@@ -243,7 +217,6 @@ public class Activity_window_main extends Activity_base {
         list.add(test_skill_small);
         list.add(test_skill_addhp);
 
-
     }
 
     private void initCalCulator() {
@@ -256,10 +229,10 @@ public class Activity_window_main extends Activity_base {
         fingerControl.setCallBack(new FingerControl.CallBack() {
             @Override
             public void send(int x, int y) {
-                S.s(" x : " + x + " y : " + y);
+                S.s(" x: " + x + " y:" + y);
                 if (player != null) {
-//                    player.speed_percent_x = (float) x / 100 / 2;
-//                    player.speed_percent_y = (float) y / 100 / 2;
+                    player.setX_direction((x != 0 ? (x > 0 ? 1 : -1) : 0));
+                    player.setY_direction((y != 0 ? (y > 0 ? 1 : -1) : 0));
                 }
             }
 
@@ -318,7 +291,7 @@ public class Activity_window_main extends Activity_base {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        flag=false;
+        flag = false;
         fingerControl.close();
         window_main.close();
     }
