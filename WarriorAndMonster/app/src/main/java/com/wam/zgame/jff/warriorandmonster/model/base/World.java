@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
+import com.wam.zgame.jff.warriorandmonster.model.expand.Monster;
 import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
+import com.wam.zgame.jff.warriorandmonster.tools.S;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,39 +23,55 @@ public class World extends GameObject {
 
     private Room room;
 
-    private Map<Integer,Room> list_room;
+    private Map<Integer, Room> list_room;
 
     private Player player;
 
     private Camera camera;
 
     //所有元素集合
-    private List<GameObject> list_creature;
+    private List<Monster> list_creature;
 
     public World() {
-       this. list_room=new HashMap<>();
+        this.list_room = new HashMap<>();
         this.list_creature = new ArrayList<>();
     }
+
     /**
-     * 向房间内添加元素
+     * 向房间内添加怪物
      *
      * @param o
      */
-    public void addObject(GameObject o) {
+    public void addMonster(Monster o) {
         list_creature.add(o);
     }
+
     /**
      * @param room
      */
     public void addRoom(Room room) {
-        list_room.put(room.getId(),room);
-        addObject(room);
+        list_room.put(room.getId(), room);
+        this.room = room;
+        if (camera != null) {
+            room.setCamera(camera);
+        }
     }
+
+    public void addCamera(Camera camera) {
+        this.camera = camera;
+        if (room != null) {
+            room.setCamera(camera);
+        }
+    }
+
+    public void addPlayer(Player player) {
+        this.player = player;
+    }
+
     /**
      * 战场是否清零
      */
     public boolean isMonsterClear() {
-        boolean isMonsterClear = false;
         for (int i = 0; i < list_creature.size(); i++) {
             GameObject gameObject = list_creature.get(i);
             if (gameObject instanceof Creature) {
@@ -62,10 +80,10 @@ public class World extends GameObject {
                     return false;
                 }
             }
-
         }
         return true;
     }
+
     /**
      * 进入某个房间
      *
@@ -76,7 +94,6 @@ public class World extends GameObject {
         if (!list_room.containsKey(id_room)) {
             //如果房间不存在,向副本添加房间
             Room room = RoomLoader.downloadRoom(id_room);
-            room.setWorld(this);
             list_room.put(room.getId(), room);
         }
         room = list_room.get(id_room);
@@ -95,28 +112,34 @@ public class World extends GameObject {
         //重新排序地图中的元素
         Collections.sort(list_creature);
         //刷新状态
-        for(GameObject gameObject:list_creature){
+        for (GameObject gameObject : list_creature) {
             gameObject.roll();
         }
-//        room.roll();
-//        player.roll();
-//        camera.roll();
+        if (room != null) {
+            room.roll();
+        }
+        if (player != null) {
+            player.roll();
+        }
+        if (camera != null) {
+            camera.roll();
+        }
     }
 
     @Override
     public void draw(Canvas canvas) {
+        S.s("----------------------------------------------------------------------------------");
+        if (room != null) {
+            room.draw(canvas);
+        }
         for (GameObject gameObject : list_creature) {
             gameObject.draw(canvas);
         }
-    }
-    public void addCamera(Camera camera) {
-        this.camera = camera;
-        addObject(camera);
+        if (player != null) {
+            player.draw(canvas);
+        }
     }
 
-    public void addPlayer(Player player){
-        this.player=player;addObject(player);
-    }
 
     public Camera getCamera() {
         return camera;

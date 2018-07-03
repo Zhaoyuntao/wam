@@ -44,9 +44,8 @@ public class Room extends GameObject {
     //风景墙区域的高度
     private int h_wall;
 
-    //所属的世界
-    private World world;
-
+    //camera
+    private Camera camera;
     //打击队列
     private List<Attack> list_attack;
 
@@ -58,7 +57,9 @@ public class Room extends GameObject {
     }
 
 
-
+    public void setCamera(Camera camera){
+        this.camera=camera;
+    }
 
 
     /**
@@ -110,8 +111,7 @@ public class Room extends GameObject {
                 w_bitmap = bitmap_floor.getWidth();
                 h_bitmap = bitmap_floor.getHeight();
             }
-            if (world != null) {
-                Camera camera=world.getCamera();
+            if (camera != null) {
                 float[] visual = camera.getVisual();
                 left = visual[0] / w_room * w_bitmap;
                 top = visual[1] / w_room * w_bitmap;
@@ -209,16 +209,4 @@ public class Room extends GameObject {
         this.h_wall = h_wall;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public void leave(Door door) {
-        int id_nextRoom = door.getNextRoomId();
-        world.gotoRoom(id_nextRoom);
-    }
 }

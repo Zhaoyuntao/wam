@@ -62,15 +62,44 @@ public class Activity_window_main extends Activity_base {
         room.setW_room(3000);
         room.setH_room(2000);
         world.addRoom(room);
-        //初始化player
+//        //初始化player
         player = new Player();
-        player.setX(0);
-        player.setY(0);
+        player.setX(50);
+        player.setY(50);
         world.addPlayer(player);
         //初始化camera
         camera=new Camera(600,400,3000,2000);
         camera.lookAt(player);
+//        camera.lookAt(player);
         world.addCamera(camera);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (flag){
+                    if(player!=null){
+                        player.setX(player.getX()+1);
+                        player.setY(player.getY()+1);
+                        if(player.getX()<0){
+                            player.setX(0);
+                        }else if(player.getX()>room.getW_room()){
+                            player.setX(0);
+                        }
+                        if(player.getY()<0){
+                            player.setY(0);
+                        }else if(player.getY()>room.getH_room()){
+                            player.setY(0);
+                        }
+//                    S.s("x:"+ player.getX()+" y:"+ player.getY());
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 
         initCalCulator();
         initCallBack();
@@ -217,67 +246,12 @@ public class Activity_window_main extends Activity_base {
 
     }
 
-    private Bitmap createCircleImage(Bitmap source, int min) {
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        Bitmap target = Bitmap.createBitmap(min, min, Bitmap.Config.ARGB_8888);
-        /**
-         * 产生一个同样大小的画布
-         */
-        Canvas canvas = new Canvas(target);
-        /**
-         * 首先绘制圆形
-         */
-        canvas.drawCircle(min / 2, min / 2, min / 2, paint);
-        /**
-         * 使用SRC_IN
-         */
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        /**
-         * 绘制图片
-         */
-        canvas.drawBitmap(source, 0, 0, paint);
-        return target;
-    }
-
     private void initCalCulator() {
         this.gameCalculator = new GameCalculator();
     }
 
     private void initCallBack() {
-//        gameCalculator.addObject(player);
-//        gameCalculator.addObject(room);
-//        for (Skill skill : list) {
-//            gameCalculator.addObject(skill);
-//        }
-//        gameCalculator.addObject(camera);
         gameCalculator.addObject(world);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (flag){
-                    player.setX(player.getX()+1);
-                    player.setY(player.getY()+1);
-                    if(player.getX()<0){
-                        player.setX(0);
-                    }else if(player.getX()>room.getW_room()){
-                        player.setX(0);
-                    }
-                    if(player.getY()<0){
-                        player.setY(0);
-                    }else if(player.getY()>room.getH_room()){
-                        player.setY(0);
-                    }
-//                    S.s("x:"+ player.getX()+" y:"+ player.getY());
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
 
         fingerControl.setCallBack(new FingerControl.CallBack() {
             @Override

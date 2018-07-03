@@ -105,6 +105,9 @@ public abstract class Element extends GameObject  {
 
     protected ZBitmap getCurrentBitmap() {
         //计算动作--------------------------------------
+        if(pictures==null||pictures.length==0){
+            return null;
+        }
         int index = -1;
         //获取当前应该执行的一连串动作的数组
         if (this.pose_now == null) {
@@ -116,6 +119,9 @@ public abstract class Element extends GameObject  {
         //获取该图片下标
         int index_pic_now = pose_now.getPicIndex();
         //获取本次应该绘制的bitmap位图
+        if(index_pic_now>pictures.length-1){
+            return null;
+        }
         ZBitmap bitmap_current = pictures[index_pic_now];
         //bitmap位图要绘制的区域
         int w_bitmap = bitmap_current.getWidth();
@@ -170,9 +176,6 @@ public abstract class Element extends GameObject  {
      */
     public void draw(Canvas canvas) {
         S.s("ele draw");
-        if (pictures == null || pose_now == null) {
-            return;
-        }
         ZBitmap bitmap_current = getCurrentBitmap();
         if (bitmap_current != null) {
             float left_real = 0;
@@ -229,6 +232,7 @@ public abstract class Element extends GameObject  {
             Paint p = new Paint();
             p.setColor(Color.RED);
             canvas.drawCircle(x, y, 30, p);
+            S.s("==============");
         }
 
 

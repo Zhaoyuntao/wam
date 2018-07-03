@@ -38,8 +38,6 @@ public class Window_main extends View implements Runnable {
         this.world = world;
     }
 
-    private final Sleeper sleeper_draw = new Sleeper();
-
     public Window_main(Context context) {
         super(context);
         init(context);
@@ -75,24 +73,9 @@ public class Window_main extends View implements Runnable {
         p.setTextSize(20);
         p.setColor(Color.BLACK);
         canvas.drawText(GameInfo.fps_draw, getWidth() - 400, 20, p);
-
-//        Bitmap bitmap_floor = null;
-//        ZBitmap zbitmap_floor=room.getZbitmap_floor();
-//        if (zbitmap_floor != null) {
-//            bitmap_floor = zbitmap_floor.getBitmap();
-//            Rect rect1 = new Rect();
-//            rect1.set(0, 0, bitmap_floor.getWidth(), bitmap_floor.getHeight());
-//            Rect rect2 = new Rect();
-//            int w = canvas.getWidth();
-//            int h = canvas.getHeight();
-//            rect2.set(0, 0, w, h);
-//            canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
-//            S.s(bitmap_floor.getWidth()+" "+bitmap_floor.getHeight()+"  " +canvas.getWidth()+" "+ canvas.getHeight());
-//        }
-
     }
 
-    public void flush_back() {
+    public synchronized void flush_back() {
         postInvalidate();
     }
 
