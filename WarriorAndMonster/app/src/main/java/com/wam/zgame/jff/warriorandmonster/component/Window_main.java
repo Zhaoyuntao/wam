@@ -13,9 +13,11 @@ import android.view.View;
 import com.wam.zgame.jff.warriorandmonster.application.GameApplication;
 import com.wam.zgame.jff.warriorandmonster.controller.GameInfo;
 import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
+import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
 import com.wam.zgame.jff.warriorandmonster.model.base.Element;
 import com.wam.zgame.jff.warriorandmonster.model.base.Room;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
+import com.wam.zgame.jff.warriorandmonster.tools.Sleeper;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 import java.util.ArrayList;
@@ -30,10 +32,6 @@ public class Window_main extends View implements Runnable {
     private boolean flag = true;
     private Thread thread;
     private Room room;
-
-    class Sleeper {
-        public boolean flag = true;
-    }
 
     public void addElement(Room room) {
         this.room = room;

@@ -1,5 +1,6 @@
 package com.wam.zgame.jff.warriorandmonster.ui;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.widget.FrameLayout;
 import com.wam.zgame.jff.warriorandmonster.R;
 import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
+import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
 import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.T;
@@ -44,6 +46,7 @@ public class Activity_window_main extends Activity_base {
     public Room room;
     private T t;
     private List<Skill> list = new ArrayList<>();
+    private Camera camera;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,6 +63,8 @@ public class Activity_window_main extends Activity_base {
         initCalCulator();
         initCallBack();
     }
+
+
 
     ZBitmap[] test_pictures;
     ZBitmap[] test_pictures_goblin;
@@ -142,10 +147,9 @@ public class Activity_window_main extends Activity_base {
                 canvas.drawText("(" + i + "," + j + ")", i, j - 5, paint);
             }
         }
-
-
 //        room.setXY(0, zBitmap.h / 3);
         room=RoomLoader.downloadRoom(-1);
+
         window_main.addElement(room);
     }
 
@@ -182,8 +186,27 @@ public class Activity_window_main extends Activity_base {
         hero = new Player();
 //        hero.setName("player");
         room.addCreature(hero);
-    }
+        hero.setX(1500);
+        hero.setY(1000);
+        camera=new Camera(600,400,3000,2000);
+        new Thread(new Runnable() {
+            float x,y;
+            @Override
+            public void run() {
+                while(flag){
+                    camera.lookAt(x++,y++);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 
+        room.addCamera(camera);
+    }
+    boolean flag=true;
 
     private void test_init_skill() {
 
@@ -265,8 +288,13 @@ public class Activity_window_main extends Activity_base {
         gameCalculator.setCallBack(new GameCalculator.CallBack() {
             @Override
             public void calculate() {
+                hero.setX(hero.getX()+1);
+                hero.setY(hero.getY()+1);
                 if (hero != null) {
                     hero.roll();
+                }
+                if(camera!=null){
+                    camera.roll();
                 }
                 if (room != null) {//测试阶段先使用单个房间作为测试副本
                     room.roll();
@@ -342,6 +370,7 @@ public class Activity_window_main extends Activity_base {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        flag=false;
         fingerControl.close();
         window_main.close();
     }

@@ -52,6 +52,9 @@ public class Room extends Element {
     //打击队列
     private List<Attack> list_attack;
 
+    //取景框
+    private Camera camera;
+
 
     public Room(int state) {
         this.state = state;
@@ -60,6 +63,9 @@ public class Room extends Element {
         this.list_doors = new ArrayList<>();
     }
 
+    public void addCamera(Camera camera) {
+        this.camera = camera;
+    }
 
     /**
      * 向房间内添加元素
@@ -119,11 +125,36 @@ public class Room extends Element {
 
     @Override
     public void draw(Canvas canvas) {
+        S.s("55555555");
+
         Bitmap bitmap_floor = null;
         if (zbitmap_floor != null) {
             bitmap_floor = zbitmap_floor.getBitmap();
+            float w_bitmap = 0;
+            float h_bitmap = 0;
+            float left = 0;
+            float top = 0;
+            float right = 0;
+            float bottom = 0;
+            if (bitmap_floor != null) {
+                w_bitmap = bitmap_floor.getWidth();
+                h_bitmap = bitmap_floor.getHeight();
+            }
+            if (camera != null) {
+                float[] visual = camera.getVisual();
+                left = visual[0] / w_room * w_bitmap;
+                top = visual[1] / w_room * w_bitmap;
+                right = visual[2] / h_room * h_bitmap;
+                bottom = visual[3] / h_room * h_bitmap;
+            } else {
+                S.s("取景框为空,默认全屏绘制");
+                left = 0;
+                top = 0;
+                right = w_bitmap;
+                bottom = h_bitmap;
+            }
             Rect rect1 = new Rect();
-            rect1.set(0, 0, bitmap_floor.getWidth(), bitmap_floor.getHeight());
+            rect1.set((int) left, (int) top, (int) right, (int) bottom);
             Rect rect2 = new Rect();
             int w = canvas.getWidth();
             int h = canvas.getHeight();
@@ -131,6 +162,7 @@ public class Room extends Element {
             Paint p = new Paint();
             canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
         }
+        S.s("1222222222");
 
         for (Creature monster : list_creature) {
             monster.draw(canvas);
