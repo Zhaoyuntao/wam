@@ -1,28 +1,18 @@
 package com.wam.zgame.jff.warriorandmonster.component;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.wam.zgame.jff.warriorandmonster.application.GameApplication;
-import com.wam.zgame.jff.warriorandmonster.controller.GameInfo;
 import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
-import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
-import com.wam.zgame.jff.warriorandmonster.model.base.Element;
-import com.wam.zgame.jff.warriorandmonster.model.base.Room;
 import com.wam.zgame.jff.warriorandmonster.model.base.World;
+import com.wam.zgame.jff.warriorandmonster.tools.B;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
-import com.wam.zgame.jff.warriorandmonster.tools.Sleeper;
-import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.wam.zgame.jff.warriorandmonster.tools.TextMeasure;
 
 /**
  * Created by zhaoyuntao on 2017/8/30.
@@ -31,8 +21,10 @@ import java.util.List;
 public class Window_main extends View implements Runnable {
 
     private boolean flag = true;
+    private float textsize = 1;
+
     private Thread thread;
-    private World  world;
+    private World world;
 
     public void addWorld(World world) {
         this.world = world;
@@ -54,6 +46,7 @@ public class Window_main extends View implements Runnable {
     }
 
     public void init(Context context) {
+        textsize = B.sp2px(context, 10);
         thread = new Thread(this);
         thread.start();
     }
@@ -66,13 +59,23 @@ public class Window_main extends View implements Runnable {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(world!=null) {
+        S.s("==================================");
+        if (world != null) {
             world.draw(canvas);
         }
         Paint p = new Paint();
-        p.setTextSize(20);
+        String text = GameParams.fps_draw;
+        float[] size = TextMeasure.measure(text, textsize);
+        float w_text = size[0];
+        float h_text = size[1];
+
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.WHITE);
+        canvas.drawText(GameParams.fps_draw, getWidth() - w_text-10, h_text, p);
+        p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.BLACK);
-        canvas.drawText(GameInfo.fps_draw, getWidth() - 400, 20, p);
+        p.setStrokeWidth(0.2f);
+        canvas.drawText(GameParams.fps_draw, getWidth() - w_text-10, h_text, p);
     }
 
     public synchronized void flush_back() {
@@ -86,10 +89,10 @@ public class Window_main extends View implements Runnable {
             flush_back();
             long time_end = System.currentTimeMillis();
             long during = time_end - time_start;
-            if (during < (1000d / GameInfo.frame_draw)) {//限帧操作
+            if (during < (1000d / GameParams.frame_draw)) {//限帧操作
                 try {
                     //如果在规定的执行时间内完成了操作,则多余的时间必须消耗完
-                    Thread.sleep((long) (1000d / GameInfo.frame_draw - during));
+                    Thread.sleep((long) (1000d / GameParams.frame_draw - during));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     return;
@@ -97,7 +100,7 @@ public class Window_main extends View implements Runnable {
             }
             time_end = System.currentTimeMillis();
             during = time_end - time_start;
-            GameInfo.fps_draw = "drawBitmap FPS:" + (int) (((double) (int) ((double) 1000 / during * 10)) / 10);
+            GameParams.fps_draw = "FPS " + (int) (((double) (int) ((double) 1000 / during * 10)) / 10);
         }
     }
 

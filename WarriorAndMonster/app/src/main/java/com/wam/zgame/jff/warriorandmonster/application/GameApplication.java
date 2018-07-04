@@ -6,9 +6,7 @@ import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.wam.zgame.jff.warriorandmonster.controller.GameInfo;
 import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
-import com.wam.zgame.jff.warriorandmonster.tools.B;
 import com.wam.zgame.jff.warriorandmonster.tools.GapSizeManager;
 import com.wam.zgame.jff.warriorandmonster.tools.TextSizeManager;
 

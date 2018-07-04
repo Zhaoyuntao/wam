@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="#111111"
     android:layout_height="match_parent">
 
     <com.wam.zgame.jff.warriorandmonster.component.Window_main
+        android:layout_margin="10dp"
         android:id="@+id/window_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

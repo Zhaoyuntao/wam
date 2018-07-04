@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.Gravity;
@@ -62,17 +60,18 @@ public class Activity_window_main extends Activity_base {
         room.setW_room(3000);
         room.setH_room(2000);
         world.addRoom(room);
-//        //初始化player
+        //初始化player
         player = new Player();
         player.setX(50);
         player.setY(50);
         player.setWorld(world);
         world.addPlayer(player);
         //初始化camera
-        camera = new Camera(1500, 1500 * ((float) GameParams.h_visual / (float) GameParams.w_visual), 3000, 2000);
+        float w_camera=2000;
+        float h_camera=2000/((float) GameParams.w_visual / (float) GameParams.h_visual);
+        camera = new Camera(w_camera, h_camera, 3000, 2000);
         camera.lookAt(player);
-//        camera.lookAt(player);
-        world.addCamera(camera);
+//        world.addCamera(camera);
 
         initCalCulator();
         initCallBack();

@@ -35,8 +35,8 @@ public class Creature extends Element {
     protected int id_hatred;
 
     //基础速度
-    protected float speed_x = 1;
-    protected float speed_y = 1;
+    protected float speed_x = 5;
+    protected float speed_y = 5;
 
     //方向
     protected int x_direction = 0;

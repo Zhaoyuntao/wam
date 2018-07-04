@@ -232,7 +232,6 @@ public abstract class Element extends GameObject  {
             p.setColor(Color.RED);
             p.setAntiAlias(true);
             canvas.drawCircle(x, y, 30, p);
-            S.s("==============");
         }
 
 

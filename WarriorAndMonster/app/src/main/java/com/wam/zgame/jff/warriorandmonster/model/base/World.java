@@ -130,9 +130,9 @@ public class World extends GameObject {
 
     @Override
     public void draw(Canvas canvas) {
-        Bitmap bitmap=Bitmap.createBitmap((int)room.getW_room(),(int)room.getH_room(), Bitmap.Config.ARGB_8888);
-        S.s("w:"+(int)room.getW_room()+" h:"+(int)room.getH_room());
-        Canvas canvas1=new Canvas(bitmap);
+        Bitmap bitmap_src = Bitmap.createBitmap((int) room.getW_room(), (int) room.getH_room(), Bitmap.Config.ARGB_8888);
+        S.s("room w:" + (int) room.getW_room() + " h:" + (int) room.getH_room());
+        Canvas canvas1 = new Canvas(bitmap_src);
 
         if (room != null) {
             room.draw(canvas1);
@@ -143,19 +143,23 @@ public class World extends GameObject {
         if (player != null) {
             player.draw(canvas1);
         }
-
-        if(camera!=null){
-           Bitmap bitmap1= camera.getVisual(bitmap);
-            Paint p=new Paint();
-            Rect rect=new Rect();
-            rect.set(0,0,bitmap1.getWidth(),bitmap1.getHeight());
-            S.s("w:"+bitmap1.getWidth()+" h:"+bitmap1.getHeight());
-            Rect rect2=new Rect();
-            rect2.set(0,0,canvas.getWidth(),canvas.getHeight());
-            S.s("w:"+canvas.getWidth()+" h:"+canvas.getHeight());
-            canvas.drawBitmap(bitmap1,rect,rect2,p);
+        Bitmap bitmap_visual = null;
+        if (camera != null) {
+            bitmap_visual = camera.getVisual(bitmap_src);
+        }else{
+            bitmap_visual = bitmap_src;
         }
-        bitmap.recycle();
+        Paint p = new Paint();
+        Rect rect = new Rect();
+        rect.set(0, 0, bitmap_visual.getWidth(), bitmap_visual.getHeight());
+        S.s("bitmap_small w:" + bitmap_visual.getWidth() + " h:" + bitmap_visual.getHeight());
+        Rect rect2 = new Rect();
+        rect2.set(0, 0, canvas.getWidth(), canvas.getHeight());
+        S.s("canvas w:" + canvas.getWidth() + " h:" + canvas.getHeight());
+        canvas.drawBitmap(bitmap_visual, rect, rect2, p);
+        bitmap_visual.recycle();
+
+        bitmap_src.recycle();
     }
 
 

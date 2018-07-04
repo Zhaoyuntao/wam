@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 
-import com.wam.zgame.jff.warriorandmonster.controller.GameInfo;
+import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 
 
 public class FingerControlImpl_control extends FingerControl implements Runnable {
@@ -74,10 +74,10 @@ public class FingerControlImpl_control extends FingerControl implements Runnable
             }
             long time_end = System.currentTimeMillis();
             long during = time_end - time_start;
-            if (during < (1000d / GameInfo.frame_sendControlCommand)) {//限帧操作
+            if (during < (1000d / GameParams.frame_sendControlCommand)) {//限帧操作
                 try {
                     //如果在规定的执行时间内完成了操作,则多余的时间必须消耗完
-                    Thread.sleep((long) (1000d / GameInfo.frame_sendControlCommand - during));
+                    Thread.sleep((long) (1000d / GameParams.frame_sendControlCommand - during));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     return;
@@ -85,7 +85,7 @@ public class FingerControlImpl_control extends FingerControl implements Runnable
             }
             time_end = System.currentTimeMillis();
             during = time_end - time_start;
-            GameInfo.fps_send = "Calculate FPS:" + (int) (((double) (int) ((double) 1000 / during * 10)) / 10);
+            GameParams.fps_send = "Calculate FPS:" + (int) (((double) (int) ((double) 1000 / during * 10)) / 10);
         }
     }
 

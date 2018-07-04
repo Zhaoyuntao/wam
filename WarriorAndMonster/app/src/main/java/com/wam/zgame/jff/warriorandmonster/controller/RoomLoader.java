@@ -7,6 +7,7 @@ import android.graphics.Paint;
 
 import com.wam.zgame.jff.warriorandmonster.model.base.Door;
 import com.wam.zgame.jff.warriorandmonster.model.base.Room;
+import com.wam.zgame.jff.warriorandmonster.tools.TextMeasure;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 /**
@@ -26,11 +27,12 @@ public class RoomLoader {
         //生成房间
         Room room = new Room(Room.DUNGEONS);
         room.setId(id);
-        room.setH_floor(1500);
-        room.setH_wall(500);
+//        room.setH_floor(1500);
+//        room.setH_wall(500);
         room.setH_room(2000);
+        room.setW_room(3000);
         room.setZbitmap_floor(createBitmap());
-        room.setZbitmap_wall(createBitmap());
+//        room.setZbitmap_wall(createBitmap());
 
         //加载门
         Door door=new Door();
@@ -59,7 +61,7 @@ public class RoomLoader {
         //绘制背景色:黑色
         canvas.drawColor(Color.parseColor("#000000"));
         //计算网格宽度
-        int w_index = w_room / 10;
+        int w_index =500;
         //设置画笔颜色
         paint.setColor(Color.WHITE);
         //设置线宽
@@ -67,15 +69,19 @@ public class RoomLoader {
         //设置抗锯齿
         paint.setAntiAlias(true);
         paint.setTextSize(30);
+
         //绘制网格线
-        for (int i = 0; i < w_room; i += w_index) {
-            for (int j = 0; j < h_room; j += w_index) {
+        for (int i = 0; i <= w_room; i += w_index) {
+            for (int j = 0; j <= h_room; j += w_index) {
                 //绘制竖线
                 canvas.drawLine(i, 0, i, h_room, paint);
                 //绘制横线
                 canvas.drawLine(0, j, w_room, j, paint);
+                String text="(" + i + "," + j + ")";
+                float textsize=20;
+                float[] size = TextMeasure.measure(text, textsize);
                 //绘制坐标
-                canvas.drawText("(" + i + "," + j + ")", i, (j - 5), paint);
+                canvas.drawText(text, i, (j - size[1]), paint);
             }
         }
         return zbitmap_floor;
