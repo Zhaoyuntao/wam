@@ -21,6 +21,8 @@ public abstract class GameObject implements Comparable {
 
     public abstract void draw(Canvas canvas);
 
+    public abstract void onChangeSize(float w,float h);
+
     protected long ct() {
         return System.currentTimeMillis();
     }

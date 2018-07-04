@@ -40,4 +40,9 @@ public class Skill extends Element {
 //        }
     }
 
+    @Override
+    public void onChangeSize(float w, float h) {
+
+    }
+
 }

@@ -31,6 +31,11 @@ public class Door extends Element {
     public void draw(Canvas canvas) {
 
     }
+
+    @Override
+    public void onChangeSize(float w, float h) {
+
+    }
     //---------------------------------------
 
     public int getRange_x() {

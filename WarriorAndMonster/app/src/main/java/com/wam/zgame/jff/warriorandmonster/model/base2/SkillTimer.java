@@ -59,6 +59,11 @@ public class SkillTimer extends Element{
     }
 
     @Override
+    public void onChangeSize(float w, float h) {
+
+    }
+
+    @Override
     public void roll() {
 
     }

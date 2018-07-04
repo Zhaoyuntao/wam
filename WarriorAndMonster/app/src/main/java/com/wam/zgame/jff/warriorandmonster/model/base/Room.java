@@ -96,6 +96,7 @@ public class Room extends GameObject {
     }
 
     public void draw(Canvas canvas) {
+        S.s("room w:"+w_room+ " h:"+h_room+" percent( w / h ):"+w_room/h_room);
         Bitmap bitmap_floor = null;
         if (zbitmap_floor != null) {
             bitmap_floor = zbitmap_floor.getBitmap();
@@ -115,18 +116,12 @@ public class Room extends GameObject {
                 top = visual[1];
                 right = visual[2] ;
                 bottom = visual[3] ;
-                S.s("camera 不为空: w:"+right+" h:"+bottom);
             } else {
                 left = 0;
                 top = 0;
                 right = w_bitmap;
                 bottom = h_bitmap;
-                S.s("camera 为空: w:"+w_bitmap+" h:"+h_bitmap);
             }
-            S.s(" GameParams.w_visual:"+ GameParams.w_visual+"  GameParams.h_visual:"+ GameParams.h_visual);
-            S.s("percent_visual:"+ GameParams.w_visual/ GameParams.h_visual);
-            S.s("percent_right/bottom:"+ right/bottom);
-            S.s("range: left:"+left+" top:"+top+" right:"+right+" bottom:"+bottom);
             Rect rect1 = new Rect();
             rect1.set((int) left, (int) top, (int) right, (int) bottom);
             Rect rect2 = new Rect();
@@ -136,6 +131,11 @@ public class Room extends GameObject {
             Paint p = new Paint();
             canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
         }
+
+    }
+
+    @Override
+    public void onChangeSize(float w, float h) {
 
     }
 

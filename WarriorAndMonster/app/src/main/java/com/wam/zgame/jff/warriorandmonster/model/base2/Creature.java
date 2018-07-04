@@ -59,6 +59,11 @@ public class Creature extends Element {
         super.draw(canvas);
     }
 
+    @Override
+    public void onChangeSize(float w, float h) {
+
+    }
+
     public void setWorld(World world) {
         this.world=world;
     }

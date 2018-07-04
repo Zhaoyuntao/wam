@@ -10,9 +10,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class FingerControl extends View {
+public abstract class FingerControl extends View {
 
-    public CallBack callBack;
     //绘制模式:圆心或者矩形
     private int mode = 1;
     public static final int MODE_CIRCLE = 1;
@@ -37,21 +36,20 @@ public class FingerControl extends View {
 
     public FingerControl(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public FingerControl(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     public FingerControl(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
-    private void init() {
-    }
+    protected abstract void init(Context context);
 
     public void setMode(int mode) {
         this.mode = mode;
@@ -73,9 +71,7 @@ public class FingerControl extends View {
         radius_pointCircle = width > height ? height / 6 : width / 6;
     }
 
-    public void setCallBack(CallBack callBack) {
-        this.callBack = callBack;
-    }
+
 
     @SuppressLint("DrawAllocation")
     @Override
@@ -194,6 +190,7 @@ public class FingerControl extends View {
                 y_sum += y_change;
                 x_move_last = event.getX();
                 y_move_last = event.getY();
+                whenMove();
                 break;
             case MotionEvent.ACTION_UP:
                 if (returnZero) {
@@ -237,17 +234,11 @@ public class FingerControl extends View {
         this.returnZero = returnZero;
     }
 
-    public void whenPress() {
+    protected abstract void whenPress() ;
 
-    }
+    protected abstract void whenMove();
 
-    public void whenUp() {
+    protected abstract void whenUp();
 
-    }
 
-    public interface CallBack {
-        void send(int x, int y);
-
-        void whenTouch();
-    }
 }

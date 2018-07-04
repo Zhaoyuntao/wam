@@ -52,4 +52,9 @@ public class Attack extends Element {
     public void draw(Canvas canvas) {
 
     }
+
+    @Override
+    public void onChangeSize(float w, float h) {
+
+    }
 }

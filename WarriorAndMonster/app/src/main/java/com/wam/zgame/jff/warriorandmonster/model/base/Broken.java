@@ -32,4 +32,9 @@ class Broken extends Element {
         //绘制剩余百分比
     }
 
+    @Override
+    public void onChangeSize(float w, float h) {
+
+    }
+
 }

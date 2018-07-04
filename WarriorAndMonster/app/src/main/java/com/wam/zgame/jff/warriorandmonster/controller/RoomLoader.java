@@ -29,11 +29,10 @@ public class RoomLoader {
         room.setId(id);
 //        room.setH_floor(1500);
 //        room.setH_wall(500);
-        room.setH_room(2000);
         room.setW_room(3000);
+        room.setH_room(2000);
         room.setZbitmap_floor(createBitmap());
 //        room.setZbitmap_wall(createBitmap());
-
         //加载门
         Door door=new Door();
         door.setOpen(false);

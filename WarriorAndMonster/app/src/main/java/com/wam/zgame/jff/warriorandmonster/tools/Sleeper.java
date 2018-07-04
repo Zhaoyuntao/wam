@@ -5,5 +5,5 @@ package com.wam.zgame.jff.warriorandmonster.tools;
  *
  */
 public class Sleeper {
-    public boolean flag;
+    public boolean flag=true;
 }

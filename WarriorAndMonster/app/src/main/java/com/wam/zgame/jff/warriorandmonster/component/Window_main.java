@@ -1,9 +1,12 @@
 package com.wam.zgame.jff.warriorandmonster.component;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,17 +16,17 @@ import com.wam.zgame.jff.warriorandmonster.model.base.World;
 import com.wam.zgame.jff.warriorandmonster.tools.B;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.TextMeasure;
+import com.wam.zgame.jff.warriorandmonster.tools.ZThread;
 
 /**
  * Created by zhaoyuntao on 2017/8/30.
  */
 
-public class Window_main extends View implements Runnable {
+public class Window_main extends View implements PreferenceManager.OnActivityDestroyListener {
 
-    private boolean flag = true;
+
     private float textsize = 1;
-
-    private Thread thread;
+    private ZThread zThread;
     private World world;
 
     public void addWorld(World world) {
@@ -47,23 +50,69 @@ public class Window_main extends View implements Runnable {
 
     public void init(Context context) {
         textsize = B.sp2px(context, 10);
-        thread = new Thread(this);
-        thread.start();
     }
 
-    public void close() {
-        flag = false;
-        thread.interrupt();
+
+    @Override
+    protected int[] onCreateDrawableState(int extraSpace) {
+        if (zThread == null) {
+            zThread = new ZThread(GameParams.frame_draw) {
+                @Override
+                protected void todo() {
+                    flush_back();
+                    GameParams.fps_draw = "FPS " + zThread.getFrame_real();
+                }
+            };
+            zThread.start();
+        }
+        return super.onCreateDrawableState(extraSpace);
+    }
+
+    Bitmap bitmap;
+
+    /**
+     * 刷新画面
+     * @param bitmap
+     */
+    public void flush(Bitmap bitmap) {
+        if (bitmap != null) {
+            this.bitmap = bitmap;
+            postInvalidate();
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        S.s("==================================");
-        if (world != null) {
-            world.draw(canvas);
+        if (bitmap == null) {
+            return;
         }
         Paint p = new Paint();
+
+        Rect rect_src = new Rect();
+        int w_bitmap = bitmap.getWidth();
+        int h_bitmap = bitmap.getHeight();
+        float prop_bitmap = w_bitmap / h_bitmap;
+        rect_src.set(0, 0, w_bitmap, h_bitmap);
+
+        Rect rect_des = new Rect();
+        float w_draw = canvas.getWidth();
+        float h_draw = canvas.getHeight();
+        float prop_canvas = w_draw / h_draw;
+        if (prop_bitmap > prop_canvas) {
+            h_draw = w_draw / prop_bitmap;
+        } else {
+            w_draw = h_draw * prop_bitmap;
+        }
+        rect_des.set(0, 0, (int) w_draw, (int) h_draw);
+
+        S.s("计算得: w_draw:" + w_draw + " h_draw:" + h_draw);
+        p.setColor(Color.WHITE);
+        canvas.drawRect(rect_des, p);
+        canvas.drawBitmap(bitmap, rect_src, rect_des, p);
+        bitmap.recycle();
+        bitmap = null;
+
         String text = GameParams.fps_draw;
         float[] size = TextMeasure.measure(text, textsize);
         float w_text = size[0];
@@ -71,37 +120,32 @@ public class Window_main extends View implements Runnable {
 
         p.setStyle(Paint.Style.FILL);
         p.setColor(Color.WHITE);
-        canvas.drawText(GameParams.fps_draw, getWidth() - w_text-10, h_text, p);
+        canvas.drawText(GameParams.fps_draw, getWidth() - w_text - 10, h_text, p);
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.BLACK);
         p.setStrokeWidth(0.2f);
-        canvas.drawText(GameParams.fps_draw, getWidth() - w_text-10, h_text, p);
+        canvas.drawText(GameParams.fps_draw, getWidth() - w_text - 10, h_text, p);
     }
 
     public synchronized void flush_back() {
         postInvalidate();
     }
 
-    @Override
-    public void run() {
-        while (flag) {
-            long time_start = System.currentTimeMillis();
-            flush_back();
-            long time_end = System.currentTimeMillis();
-            long during = time_end - time_start;
-            if (during < (1000d / GameParams.frame_draw)) {//限帧操作
-                try {
-                    //如果在规定的执行时间内完成了操作,则多余的时间必须消耗完
-                    Thread.sleep((long) (1000d / GameParams.frame_draw - during));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-            time_end = System.currentTimeMillis();
-            during = time_end - time_start;
-            GameParams.fps_draw = "FPS " + (int) (((double) (int) ((double) 1000 / during * 10)) / 10);
+    private void close() {
+        if (zThread != null) {
+            zThread.close();
+            zThread = null;
         }
     }
 
+    @Override
+    public void onActivityDestroy() {
+        close();
+    }
+
+    @Override
+    public void destroyDrawingCache() {
+        close();
+        super.destroyDrawingCache();
+    }
 }

@@ -69,6 +69,13 @@ public class Activity_base extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         S.s("onDestroy"+" "+ activity_num);

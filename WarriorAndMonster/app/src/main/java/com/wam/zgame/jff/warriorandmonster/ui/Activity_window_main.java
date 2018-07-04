@@ -6,26 +6,19 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.Gravity;
-import android.widget.FrameLayout;
-
 
 import com.wam.zgame.jff.warriorandmonster.R;
-import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
 import com.wam.zgame.jff.warriorandmonster.model.base.Camera;
 import com.wam.zgame.jff.warriorandmonster.model.base.World;
 import com.wam.zgame.jff.warriorandmonster.model.expand.Player;
 import com.wam.zgame.jff.warriorandmonster.tools.S;
-import com.wam.zgame.jff.warriorandmonster.tools.T;
 import com.wam.zgame.jff.warriorandmonster.model.base.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wam.zgame.jff.warriorandmonster.component.FingerControl;
 import com.wam.zgame.jff.warriorandmonster.component.FingerControlImpl_control;
-import com.wam.zgame.jff.warriorandmonster.controller.GameCalculator;
 import com.wam.zgame.jff.warriorandmonster.model.base.Room;
 import com.wam.zgame.jff.warriorandmonster.component.Window_main;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
@@ -37,14 +30,9 @@ import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 public class Activity_window_main extends Activity_base {
     FingerControlImpl_control fingerControl;
     Window_main window_main;
-    //    Window_skill window_skill;
-    public GameCalculator gameCalculator;
+
     public Player player;
-    public Room room;
     public World world;
-    private T t;
-    private List<Skill> list = new ArrayList<>();
-    private Camera camera;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,13 +40,13 @@ public class Activity_window_main extends Activity_base {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_window_main);
         initView();
+        initCallBack();
         //初始化world
         world = new World();
         window_main.addWorld(world);
         //初始化room
-        room = RoomLoader.downloadRoom(-1);
-        room.setW_room(3000);
-        room.setH_room(2000);
+        Room room = RoomLoader.downloadRoom(-1);
+//        room.setZbitmap_floor(new ZBitmap(B.getBitmapById(Activity_window_main.this,R.drawable.town)));
         world.addRoom(room);
         //初始化player
         player = new Player();
@@ -67,15 +55,70 @@ public class Activity_window_main extends Activity_base {
         player.setWorld(world);
         world.addPlayer(player);
         //初始化camera
-        float w_camera=2000;
-        float h_camera=2000/((float) GameParams.w_visual / (float) GameParams.h_visual);
-        camera = new Camera(w_camera, h_camera, 3000, 2000);
+        float w_camera = 1500;
+        float h_camera = 1500;
+        Camera camera = new Camera();
+        camera.setSize(w_camera, h_camera);
         camera.lookAt(player);
-//        world.addCamera(camera);
 
-        initCalCulator();
-        initCallBack();
+        world.addCamera(camera);
+        world.setCallBack(new World.CallBack() {
+            @Override
+            public void onDraw(Bitmap bitmap) {
+                window_main.flush(bitmap);
+            }
+        });
+        world.start();
     }
+
+    private void initView() {
+        fingerControl = findViewById(R.id.fingercontrol);
+        window_main = findViewById(R.id.window_main);
+    }
+
+    private void initCallBack() {
+
+        fingerControl.setCallBack(new FingerControlImpl_control.CallBack() {
+            @Override
+            public void whenPress() {
+
+            }
+
+            @Override
+            public void send(int x, int y) {
+                S.s(" x: " + x + " y:" + y);
+                if (player != null) {
+                    player.setX_direction((x != 0 ? (x > 0 ? 1 : -1) : 0));
+                    player.setY_direction((y != 0 ? (y > 0 ? 1 : -1) : 0));
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(world!=null){
+            world.pauseDraw();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(world!=null){
+            world.resumeDraw();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (world != null) {
+            world.destroy();
+        }
+        super.onDestroy();
+    }
+
 
     ZBitmap[] test_pictures;
     ZBitmap[] test_pictures_goblin;
@@ -168,7 +211,6 @@ public class Activity_window_main extends Activity_base {
         float range_y = 120;
     }
 
-    boolean flag = true;
 
     private void test_init_skill() {
 
@@ -208,7 +250,7 @@ public class Activity_window_main extends Activity_base {
 //        test_skill_addhp.player = player;
 //        test_skill_addhp.bitmap_ok = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_hp_ok, 1);
 //        test_skill_addhp.bitmap_no = B.getDrawableById_Percent(Activity_window_main.this, R.drawable.skill_hp_no, 1);
-
+        List<Skill> list = new ArrayList<>();
 
         list.add(test_skill_attack);
         list.add(test_skill_jumpback);
@@ -218,80 +260,5 @@ public class Activity_window_main extends Activity_base {
 
     }
 
-    private void initCalCulator() {
-        this.gameCalculator = new GameCalculator();
-    }
 
-    private void initCallBack() {
-        gameCalculator.addObject(world);
-
-        fingerControl.setCallBack(new FingerControl.CallBack() {
-            @Override
-            public void send(int x, int y) {
-                S.s(" x: " + x + " y:" + y);
-                if (player != null) {
-                    player.setX_direction((x != 0 ? (x > 0 ? 1 : -1) : 0));
-                    player.setY_direction((y != 0 ? (y > 0 ? 1 : -1) : 0));
-                }
-            }
-
-            @Override
-            public void whenTouch() {
-
-            }
-        });
-//        window_skill.setCallBack(new Window_skill.CallBack() {
-//            @Override
-//            public void whenPress(int number) {
-//                if (number >= 0 && number < list.size()) {
-//                    Skill skill = list.get(number);
-////                    if (skill.isOk()) {
-////                        T.t(getApplication(), skill.name);
-////                    }
-////                    skill.go();
-//                }
-//
-//            }
-//
-//            @Override
-//            public Bitmap getBitmap_skill(int index) {
-////                if (index >= 0 && index < list.size()) {
-////                    Skill skill = list.get(index);
-////                    return skill.time_rest > 0 ? skill.bitmap_no : skill.bitmap_ok;
-////                }
-//                return null;
-//            }
-//
-//            @Override
-//            public Skill getSkill(int index) {
-//                if (index >= 0 && index < list.size()) {
-//                    Skill skill = list.get(index);
-//                    return skill;
-//                }
-//                return null;
-//            }
-//
-//        });
-    }
-
-    private void initView() {
-        fingerControl = findViewById(R.id.fingercontrol);
-        window_main = findViewById(R.id.window_main);
-//        window_skill = findViewById(R.id.window_skill);
-
-        int h_window_skill = (int) (GameParams.h_visual / 2);
-        int w_window_skill = h_window_skill / 3 * 2;
-        FrameLayout.LayoutParams fl_window_skill = new FrameLayout.LayoutParams(w_window_skill, h_window_skill);
-        fl_window_skill.gravity = Gravity.RIGHT | Gravity.BOTTOM;
-//        window_skill.setLayoutParams(fl_window_skill);
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        flag = false;
-        fingerControl.close();
-        window_main.close();
-    }
 }
