@@ -8,20 +8,20 @@ import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.tools.ZThread;
 
 
-public class FingerControlImpl_control extends FingerControl {
+public class FingerControlImpl extends FingerControl {
 
 
     private CallBack callBack;
 
-    public FingerControlImpl_control(Context context) {
+    public FingerControlImpl(Context context) {
         super(context);
     }
 
-    public FingerControlImpl_control(Context context, AttributeSet attrs) {
+    public FingerControlImpl(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public FingerControlImpl_control(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FingerControlImpl(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -52,12 +52,13 @@ public class FingerControlImpl_control extends FingerControl {
     public void whenUp() {
         if (callBack != null) {
             callBack.send(0, 0);
+            callBack.whenUp();
         }
     }
 
     public interface CallBack {
         void whenPress();
-
+        void whenUp();
         void send(int x, int y);
     }
 }

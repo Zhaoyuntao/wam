@@ -17,10 +17,6 @@ import com.wam.zgame.jff.warriorandmonster.tools.S;
 public class Camera extends GameObject {
     //取景框大小
     private float w_visual, h_visual;
-    //取景框缩放
-    private float percent = 1;
-    //room
-    private Room room;
     //room的大小
     private float w_room, h_room;
     //取景框范围
@@ -43,7 +39,6 @@ public class Camera extends GameObject {
     }
 
     public void setRoom(Room room) {
-        this.room = room;
         this.w_room = room.getW_room();
         this.h_room = room.getH_room();
     }
@@ -51,8 +46,8 @@ public class Camera extends GameObject {
     public void setSize(float w_visual, float h_visual) {
         this.w_visual = w_visual;
         this.h_visual = h_visual;
-        this.distance_min_x = w_visual / 3;
-        this.distance_min_y = h_visual / 3;
+        this.distance_min_x = w_visual * 0.48f;
+        this.distance_min_y = h_visual * 0.49f;
     }
 
     /**
@@ -87,15 +82,6 @@ public class Camera extends GameObject {
 
 
     /**
-     * 缩放取景框
-     *
-     * @param percent
-     */
-    public synchronized void scale(float percent) {
-        this.percent = percent;
-    }
-
-    /**
      * 释放取景框,取景框将会选取上次跟随的目标进行取景
      */
     public synchronized void release() {
@@ -105,6 +91,10 @@ public class Camera extends GameObject {
     @Override
     public void roll() {
 
+        float w_visual = this.w_visual;
+        float h_visual = this.h_visual;
+        float x_visual = this.x_visual;
+        float y_visual = this.y_visual;
         //如果没有外部锁定取景框
         if (!lock) {
             Creature creature_now = this.creature;
@@ -145,18 +135,18 @@ public class Camera extends GameObject {
         }
 
         //计算边界
-        left = x_visual_tmp;
-        right = left + w_visual;
-        top = y_visual_tmp;
-        bottom = top + h_visual;
+        synchronized (Camera.class) {
+            left = x_visual_tmp;
+            right = left + w_visual;
+            top = y_visual_tmp;
+            bottom = top + h_visual;
 
-
-        //赋值
-        this.x_visual = x_visual_tmp;
-        this.y_visual = y_visual_tmp;
-        this.x_visual_last = this.x_visual;
-        this.y_visual_last = this.y_visual;
-
+            //赋值
+            this.x_visual = x_visual_tmp;
+            this.y_visual = y_visual_tmp;
+            this.x_visual_last = this.x_visual;
+            this.y_visual_last = this.y_visual;
+        }
     }
 
     @Override
@@ -166,23 +156,48 @@ public class Camera extends GameObject {
 
     @Override
     public void onChangeSize(float w, float h) {
+        if (w == 0 || h == 0 || w_visual == 0 || h_visual == 0) {
+            return;
+        }
+        float prop_view = w / h;
+        float width_virsual = h * prop_view;
 
+        setSize(width_virsual, h_visual);
     }
 
 
     public Bitmap getVisual(Bitmap bitmap_src) {
-        S.s(" bitmap_src w:" + bitmap_src.getWidth() + "  h:" + bitmap_src.getHeight() + " (w/h):" + ((float) bitmap_src.getWidth() / bitmap_src.getHeight()));
-        Bitmap bitmap_visual = Bitmap.createBitmap((int) w_visual, (int) h_visual, Bitmap.Config.ARGB_8888);
-        S.s("bitmap_visual w:" + right + " h:" + bottom + " percent(w/h):" + right / bottom);
-        Rect rect = new Rect();
-        rect.set((int) left, (int) top, (int) right, (int) bottom);
-        S.s("draw rect_src:  left:" + left + " top:" + top + " right:" + right + " bottom:" + bottom);
-        Rect rect2 = new Rect();
-        Canvas canvas_visual = new Canvas(bitmap_visual);
-        canvas_visual.drawColor(Color.parseColor("#55006600"));
-        rect2.set(0, 0, canvas_visual.getWidth(), canvas_visual.getHeight());
-        S.s("                                                      w:" + canvas_visual.getWidth() + " h:" + canvas_visual.getHeight());
-        canvas_visual.drawBitmap(bitmap_src, rect, rect2, new Paint());
+        if (right == 0 || bottom == 0) {
+            return null;
+        }
+        float x_visual = 0;
+        float y_visual = 0;
+        float w_visual = 0;
+        float h_visual = 0;
+        synchronized (Camera.class) {
+            x_visual = this.x_visual;
+            y_visual = this.y_visual;
+            w_visual = this.w_visual;
+            h_visual = this.h_visual;
+        }
+        Bitmap bitmap_visual = Bitmap.createBitmap(bitmap_src, (int) x_visual, (int) y_visual, (int) (w_visual), (int) (h_visual));
+
+//        Bitmap bitmap_visual = Bitmap.createBitmap((int) w_visual, (int) h_visual, Bitmap.Config.ARGB_8888);
+//        Canvas canvas_visual = new Canvas(bitmap_visual);
+//
+//        Rect rect_src = new Rect();
+//        rect_src.set((int) left, (int) top, (int) right, (int) bottom);
+//        Rect rect_des = new Rect();
+//        rect_des.set(0, 0, canvas_visual.getWidth(), canvas_visual.getHeight());
+////
+//        canvas_visual.drawColor(Color.parseColor("#55006600"));
+//        Paint p = new Paint();
+//        canvas_visual.drawBitmap(bitmap_src, rect_src, rect_des, p);
+//        p.setStyle(Paint.Style.STROKE);
+//        p.setStrokeWidth(2);
+//        p.setColor(Color.BLUE);
+//        canvas_visual.drawRect(new Rect((int) (distance_min_x), (int) (distance_min_y), (int) (w_visual -distance_min_x), (int) (h_visual-distance_min_y)), p);
+
         return bitmap_visual;
     }
 }

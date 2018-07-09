@@ -22,16 +22,11 @@ import com.wam.zgame.jff.warriorandmonster.tools.ZThread;
  * Created by zhaoyuntao on 2017/8/30.
  */
 
-public class Window_main extends View implements PreferenceManager.OnActivityDestroyListener {
+public class Window_main extends View {
 
 
-    private float textsize = 1;
-    private ZThread zThread;
-    private World world;
-
-    public void addWorld(World world) {
-        this.world = world;
-    }
+    private float textsize;
+    private float margin_right;
 
     public Window_main(Context context) {
         super(context);
@@ -49,23 +44,8 @@ public class Window_main extends View implements PreferenceManager.OnActivityDes
     }
 
     public void init(Context context) {
-        textsize = B.sp2px(context, 10);
-    }
-
-
-    @Override
-    protected int[] onCreateDrawableState(int extraSpace) {
-        if (zThread == null) {
-            zThread = new ZThread(GameParams.frame_draw) {
-                @Override
-                protected void todo() {
-                    flush_back();
-                    GameParams.fps_draw = "FPS " + zThread.getFrame_real();
-                }
-            };
-            zThread.start();
-        }
-        return super.onCreateDrawableState(extraSpace);
+        textsize = B.sp2px(context, 15);
+        margin_right=B.dip2px(context,40);
     }
 
     Bitmap bitmap;
@@ -74,7 +54,7 @@ public class Window_main extends View implements PreferenceManager.OnActivityDes
      * 刷新画面
      * @param bitmap
      */
-    public void flush(Bitmap bitmap) {
+    public synchronized void flush(Bitmap bitmap) {
         if (bitmap != null) {
             this.bitmap = bitmap;
             postInvalidate();
@@ -83,17 +63,18 @@ public class Window_main extends View implements PreferenceManager.OnActivityDes
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        Bitmap bitmap=this.bitmap;
+//        this.bitmap=null;
         if (bitmap == null) {
             return;
         }
         Paint p = new Paint();
 
         Rect rect_src = new Rect();
-        int w_bitmap = bitmap.getWidth();
-        int h_bitmap = bitmap.getHeight();
+        float w_bitmap = bitmap.getWidth();
+        float h_bitmap = bitmap.getHeight();
         float prop_bitmap = w_bitmap / h_bitmap;
-        rect_src.set(0, 0, w_bitmap, h_bitmap);
+        rect_src.set(0, 0, (int)w_bitmap, (int)h_bitmap);
 
         Rect rect_des = new Rect();
         float w_draw = canvas.getWidth();
@@ -106,46 +87,27 @@ public class Window_main extends View implements PreferenceManager.OnActivityDes
         }
         rect_des.set(0, 0, (int) w_draw, (int) h_draw);
 
-        S.s("计算得: w_draw:" + w_draw + " h_draw:" + h_draw);
         p.setColor(Color.WHITE);
         canvas.drawRect(rect_des, p);
         canvas.drawBitmap(bitmap, rect_src, rect_des, p);
-        bitmap.recycle();
-        bitmap = null;
+
 
         String text = GameParams.fps_draw;
+        String text2 = GameParams.fps_cal;
         float[] size = TextMeasure.measure(text, textsize);
         float w_text = size[0];
         float h_text = size[1];
 
         p.setStyle(Paint.Style.FILL);
         p.setColor(Color.WHITE);
-        canvas.drawText(GameParams.fps_draw, getWidth() - w_text - 10, h_text, p);
+        canvas.drawText(text, getWidth() -margin_right, h_text, p);
+        canvas.drawText(text2, getWidth() -margin_right, h_text*3, p);
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.BLACK);
         p.setStrokeWidth(0.2f);
-        canvas.drawText(GameParams.fps_draw, getWidth() - w_text - 10, h_text, p);
+        p.setTextSize(textsize);
+        canvas.drawText(text, getWidth() -margin_right, h_text, p);
+        canvas.drawText(text2, getWidth() -margin_right, h_text*3, p);
     }
 
-    public synchronized void flush_back() {
-        postInvalidate();
-    }
-
-    private void close() {
-        if (zThread != null) {
-            zThread.close();
-            zThread = null;
-        }
-    }
-
-    @Override
-    public void onActivityDestroy() {
-        close();
-    }
-
-    @Override
-    public void destroyDrawingCache() {
-        close();
-        super.destroyDrawingCache();
-    }
 }

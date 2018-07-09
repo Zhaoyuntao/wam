@@ -1,6 +1,5 @@
 package com.wam.zgame.jff.warriorandmonster.tools;
 
-import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 
 /**
  * Created by zhaoyuntao on 2018/7/4.
@@ -71,15 +70,17 @@ public abstract class ZThread extends Thread {
     public void close() {
         flag = false;
         interrupt();
-        pause=false;
+        pause = false;
     }
 
     public void pauseThread() {
-        pause=true;
+        pause = true;
     }
 
-    public void resumeThread(){
-        pause=false;
-        sleeper.notifyAll();
+    public void resumeThread() {
+        pause = false;
+        synchronized (sleeper) {
+            sleeper.notifyAll();
+        }
     }
 }

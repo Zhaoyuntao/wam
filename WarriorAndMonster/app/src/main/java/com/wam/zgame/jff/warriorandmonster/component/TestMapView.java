@@ -393,7 +393,6 @@ public class TestMapView extends BaseView implements Runnable {
         int during_flushMove = (int) (1000 / 600);
 //        S.s("during_flushMove: " + during_flushMove + " 1000/60:  " + (int) (1000 / 600f));
         while (flag) {
-//            S.s("----------------------------------------------------------------");
 //            if (pause) {
             synchronized (sleeper) {
                 try {
@@ -408,7 +407,6 @@ public class TestMapView extends BaseView implements Runnable {
             //执行开始
             calculatePosition();
             //执行结束
-//            S.s("-------------------------------------------------------------------");
             long time_end = System.currentTimeMillis();//结束时间
             long during = time_end - time_now;//持续时间
 

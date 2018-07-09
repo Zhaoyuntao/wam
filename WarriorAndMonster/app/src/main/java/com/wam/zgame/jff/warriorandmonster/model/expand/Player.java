@@ -24,6 +24,12 @@ public class Player extends Creature {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+
+        if(true){
+            return;
+        }
+
+
         Paint p=new Paint();
         //绘制名称------------------------
         String content = "Lv." + level + " " + name;
@@ -51,9 +57,8 @@ public class Player extends Creature {
         p.setTextSize(textsize);
         p.setStyle(Paint.Style.FILL);
         canvas.drawText(content, x_text_draw, y_text_draw, p);
-        p.setColor(Color.BLACK);
-        p.setTextSize(textsize);
         p.setStyle(Paint.Style.STROKE);
+        p.setColor(Color.BLACK);
         p.setStrokeWidth(1);
         canvas.drawText(content, x_text_draw, y_text_draw, p);
 

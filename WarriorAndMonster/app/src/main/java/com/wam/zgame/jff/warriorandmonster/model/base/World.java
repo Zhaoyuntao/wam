@@ -2,8 +2,8 @@ package com.wam.zgame.jff.warriorandmonster.model.base;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 
-import com.wam.zgame.jff.warriorandmonster.controller.GameParams;
 import com.wam.zgame.jff.warriorandmonster.controller.RoomLoader;
 import com.wam.zgame.jff.warriorandmonster.model.base2.Creature;
 import com.wam.zgame.jff.warriorandmonster.model.expand.Monster;
@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class World {
 
+    public static int frame_draw = 100;
+    public static int frame_cal = 300;
     //房间
     private Room room;
     //第一人称
@@ -76,11 +78,8 @@ public class World {
         addObject(room);
         list_room.put(room.getId(), room);
         this.room = room;
-        if (camera != null) {
-            camera.setRoom(room);
-        }
-        if (room != null) {
-            room.setCamera(camera);
+        if (this.camera != null && this.room != null) {
+            this.camera.setRoom(this.room);
         }
     }
 
@@ -92,13 +91,12 @@ public class World {
     public void addCamera(Camera camera) {
         addObject(camera);
         this.camera = camera;
-        if (room != null) {
-            room.setCamera(camera);
-        }
-        if (camera != null) {
-            camera.setRoom(room);
+        if (this.camera != null && room != null) {
+            this.camera.setRoom(this.room);
         }
     }
+
+
 
     /**
      * 添加第一人称
@@ -107,6 +105,9 @@ public class World {
      */
     public void addPlayer(Player player) {
         this.player = player;
+        if(this.player!=null){
+            this.player.setWorld(this);
+        }
         addObject(player);
     }
 
@@ -151,20 +152,18 @@ public class World {
     ZThread zThread_roll;
     ZThread zThread_draw;
 
-    public void start() {
+    public synchronized void start() {
         if (zThread_roll == null) {
-            zThread_roll = new ZThread(GameParams.frame_cal) {
+            zThread_roll = new ZThread(frame_cal) {
                 @Override
                 protected void todo() {
-                    for (GameObject gameObject : list_object) {
-                        gameObject.roll();
-                    }
+                    roll();
                 }
             };
             zThread_roll.start();
         }
         if (zThread_draw == null) {
-            zThread_draw = new ZThread(GameParams.frame_cal) {
+            zThread_draw = new ZThread(frame_draw) {
                 @Override
                 protected void todo() {
                     draw();
@@ -174,12 +173,28 @@ public class World {
         }
     }
 
+    public float getFps_draw() {
+        return fps_draw;
+    }
+
+    public float getFps_cal() {
+        return fps_cal;
+    }
+
+    private float fps_draw, fps_cal;
+
     private void roll() {
         //重新排序地图中的元素
         Collections.sort(list_creature);
         //刷新状态
-        for (GameObject gameObject : list_creature) {
+        for (GameObject gameObject : list_object) {
             gameObject.roll();
+        }
+        if(zThread_roll!=null) {
+            fps_cal = zThread_roll.getFrame_real();
+        }
+        if(zThread_draw!=null) {
+            fps_draw = zThread_draw.getFrame_real();
         }
     }
 
@@ -187,14 +202,10 @@ public class World {
         Bitmap bitmap_src = Bitmap.createBitmap((int) room.getW_room(), (int) room.getH_room(), Bitmap.Config.ARGB_8888);
         Canvas canvas_src = new Canvas(bitmap_src);
 
-        if (room != null) {
-            room.draw(canvas_src);
-        }
-        for (GameObject gameObject : list_creature) {
+        canvas_src.drawColor(Color.YELLOW);
+
+        for (GameObject gameObject : list_object) {
             gameObject.draw(canvas_src);
-        }
-        if (player != null) {
-            player.draw(canvas_src);
         }
         Bitmap bitmap_visual = null;
         if (camera != null) {
@@ -208,7 +219,10 @@ public class World {
     }
 
     public void onChangeSize(float w, float h) {
-
+        //刷新状态
+        for (GameObject gameObject : list_object) {
+            gameObject.onChangeSize(w,h);
+        }
     }
 
     public Room getRoom() {
@@ -227,7 +241,7 @@ public class World {
         }
     }
 
-    public void destroy() {
+    public synchronized void destroy() {
         if (zThread_roll != null) {
             zThread_roll.close();
             zThread_roll = null;

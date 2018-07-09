@@ -1,5 +1,7 @@
 package com.wam.zgame.jff.warriorandmonster.model.base;
 
+import com.wam.zgame.jff.warriorandmonster.tools.S;
+
 /**
  * Created by zhaoyuntao on 2018/5/18.
  * <p>
@@ -22,6 +24,8 @@ public abstract class Pose extends Element {
     //重复次数,如果为-1则为无限重复
     private int repeat = 1;
 
+    private boolean breakDown;
+
     public Pose(int[] index_pic, int index_all, int repeat) {
         this.index_pic = index_pic;
         this.index_all = index_all;
@@ -42,20 +46,28 @@ public abstract class Pose extends Element {
      */
     protected abstract long getDuring_action();
 
+    protected void breakDown() {
+        breakDown = true;
+    }
+
     @Override
     public void roll() {
+        super.roll();
         //如果动作帧数目小于等于0,则不执行任何操作------
         if (index_all <= 0 || repeat == 0) {
             return;
         }
+        if (breakDown) {
+            return;
+        }
         //获取时间
         long time_now = ct();
-        long time_last = this.time_last;
-        //获取上次循环的时间
-        if (time_last == 0) {
-            time_last = time_now;
-        }
 
+        //获取上次循环的时间
+        if (this.time_last == 0) {
+            this.time_last = time_now;
+        }
+        long time_last = this.time_last;
         //获得技能帧间隔
         long during_action = getDuring_action();
         //计算这次循环距离上次的时间差
@@ -68,12 +80,18 @@ public abstract class Pose extends Element {
             int index_last = this.index_last;
             //取余,循环帧数,
             int index_now = (index_last + indexs) % index_all;
-            //记录改变本次帧下标的时间+=帧数*帧间隔
-            time_last += (indexs * during_action);
-            index_last = index_now;
-            this.time_last = time_last;
-            this.index_now = index_now;
-            this.index_last = index_last;
+            S.s("计算得:index_now:"+index_now);
+            //如果执行到队列尾部, 且无剩余重复次数, 或者强制中断时
+            if (repeat != -1 && repeat-- <= 0 && index_now >= index_pic.length - 1) {
+                breakDown = true;
+            } else {
+                //记录改变本次帧下标的时间+=帧数*帧间隔
+                time_last += (indexs * during_action);
+                index_last = index_now;
+                this.time_last = time_last;
+                this.index_now = index_now;
+                this.index_last = index_last;
+            }
         }
     }
 
@@ -87,13 +105,8 @@ public abstract class Pose extends Element {
         //如果当前下标小于最大下标
         if (index_pic != null && index_pic.length > index_now) {
             return index_pic[index_now];
-        }
-        //如果循环
-        if (repeat == -1 || repeat-- > 0) {
-            return 0;
         } else {
-            //如果执行次数大于0
-            return -1;
+            return 0;
         }
     }
 }

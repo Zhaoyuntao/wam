@@ -10,6 +10,7 @@ import com.wam.zgame.jff.warriorandmonster.tools.S;
 import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,28 +38,32 @@ public class Room extends GameObject {
     private float w_room;
     private float h_room;
 
-    //地板区域的高度
+    //活动区域的高度
+    private float w_floor;
     private float h_floor;
-    //风景墙区域的高度
-    private float h_wall;
+    private float x_floor;
+    private float y_floor;
 
-    //camera
-    private Camera camera;
+    //风景墙的高度
+    private float w_wall;
+    private float h_wall;
+    private float x_wall;
+    private float y_wall;
+
+    //背景区域的高度
+    private float w_back;
+    private float h_back;
+    private float x_back;
+    private float y_back;
+
     //打击队列
     private List<Attack> list_attack;
 
     public Room(int state) {
         this.state = state;
         this.list_attack = new ArrayList<>();
-
         this.list_doors = new ArrayList<>();
     }
-
-
-    public void setCamera(Camera camera){
-        this.camera=camera;
-    }
-
 
     /**
      * 添加打击
@@ -68,7 +73,6 @@ public class Room extends GameObject {
     public void addAttack(Attack attack) {
         list_attack.add(attack);
     }
-
 
 
     @Override
@@ -96,42 +100,66 @@ public class Room extends GameObject {
     }
 
     public void draw(Canvas canvas) {
-        S.s("room w:"+w_room+ " h:"+h_room+" percent( w / h ):"+w_room/h_room);
+        Bitmap bitmap_back = null;
+        if (zbitmap_back != null) {
+            bitmap_back = zbitmap_back.getBitmap();
+            if (bitmap_back != null) {
+                float w_bitmap = bitmap_back.getWidth();
+                float h_bitmap = bitmap_back.getHeight();
+
+                int left = (int) x_back;
+                int top = (int) y_back;
+                int right = (int) (x_back + w_back);
+                int bottom = (int) (y_back + h_back);
+
+                Rect rect1 = new Rect();
+                rect1.set(0, 0, (int) w_bitmap, (int) h_bitmap);
+                Rect rect2 = new Rect();
+                rect2.set(left, top, right, bottom);
+                Paint p = new Paint();
+                canvas.drawBitmap(bitmap_back, rect1, rect2, p);
+            }
+        }
         Bitmap bitmap_floor = null;
         if (zbitmap_floor != null) {
             bitmap_floor = zbitmap_floor.getBitmap();
-            float w_bitmap = 0;
-            float h_bitmap = 0;
-            float left = 0;
-            float top = 0;
-            float right = 0;
-            float bottom = 0;
             if (bitmap_floor != null) {
-                w_bitmap = bitmap_floor.getWidth();
-                h_bitmap = bitmap_floor.getHeight();
-            }
-            if (camera != null) {
-                float[] visual = camera.getVisualRange();
-                left = visual[0] ;
-                top = visual[1];
-                right = visual[2] ;
-                bottom = visual[3] ;
-            } else {
-                left = 0;
-                top = 0;
-                right = w_bitmap;
-                bottom = h_bitmap;
-            }
-            Rect rect1 = new Rect();
-            rect1.set((int) left, (int) top, (int) right, (int) bottom);
-            Rect rect2 = new Rect();
-            int w = canvas.getWidth();
-            int h = canvas.getHeight();
-            rect2.set(0, 0, w, h);
-            Paint p = new Paint();
-            canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
-        }
+                float w_bitmap = bitmap_floor.getWidth();
+                float h_bitmap = bitmap_floor.getHeight();
 
+                int left = (int) x_floor;
+                int top = (int) y_floor;
+                int right = (int) (x_floor + w_floor);
+                int bottom = (int) (y_floor + h_floor);
+
+                Rect rect1 = new Rect();
+                rect1.set(0, 0, (int) w_bitmap, (int) h_bitmap);
+                Rect rect2 = new Rect();
+                rect2.set(left, top, right, bottom);
+                Paint p = new Paint();
+                canvas.drawBitmap(bitmap_floor, rect1, rect2, p);
+            }
+        }
+        Bitmap bitmap_wall = null;
+        if (zbitmap_wall != null) {
+            bitmap_wall = zbitmap_wall.getBitmap();
+            if (bitmap_wall != null) {
+                float w_bitmap = bitmap_wall.getWidth();
+                float h_bitmap = bitmap_wall.getHeight();
+
+                int left = (int) x_wall;
+                int top = (int) y_wall;
+                int right = (int) (x_wall + w_wall);
+                int bottom = (int) (y_wall + h_wall);
+
+                Rect rect1 = new Rect();
+                rect1.set(0, 0, (int) w_bitmap, (int) h_bitmap);
+                Rect rect2 = new Rect();
+                rect2.set(left, top, right, bottom);
+                Paint p = new Paint();
+                canvas.drawBitmap(bitmap_wall, rect1, rect2, p);
+            }
+        }
     }
 
     @Override
@@ -140,7 +168,6 @@ public class Room extends GameObject {
     }
 
 
-    //------------------------ set and get
     public int getState() {
         return state;
     }
@@ -211,5 +238,85 @@ public class Room extends GameObject {
 
     public void setH_wall(float h_wall) {
         this.h_wall = h_wall;
+    }
+
+    public float getX_floor() {
+        return x_floor;
+    }
+
+    public void setX_floor(float x_floor) {
+        this.x_floor = x_floor;
+    }
+
+    public float getY_floor() {
+        return y_floor;
+    }
+
+    public void setY_floor(float y_floor) {
+        this.y_floor = y_floor;
+    }
+
+    public float getX_wall() {
+        return x_wall;
+    }
+
+    public void setX_wall(float x_wall) {
+        this.x_wall = x_wall;
+    }
+
+    public float getY_wall() {
+        return y_wall;
+    }
+
+    public void setY_wall(float y_wall) {
+        this.y_wall = y_wall;
+    }
+
+    public float getH_back() {
+        return h_back;
+    }
+
+    public void setH_back(float h_back) {
+        this.h_back = h_back;
+    }
+
+    public float getX_back() {
+        return x_back;
+    }
+
+    public void setX_back(float x_back) {
+        this.x_back = x_back;
+    }
+
+    public float getY_back() {
+        return y_back;
+    }
+
+    public void setY_back(float y_back) {
+        this.y_back = y_back;
+    }
+
+    public float getW_floor() {
+        return w_floor;
+    }
+
+    public void setW_floor(float w_floor) {
+        this.w_floor = w_floor;
+    }
+
+    public float getW_wall() {
+        return w_wall;
+    }
+
+    public void setW_wall(float w_wall) {
+        this.w_wall = w_wall;
+    }
+
+    public float getW_back() {
+        return w_back;
+    }
+
+    public void setW_back(float w_back) {
+        this.w_back = w_back;
     }
 }
