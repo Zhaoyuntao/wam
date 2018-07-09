@@ -13,25 +13,24 @@ public class ZBitmap {
 
     private Bitmap bitmap;
 
-    private int w;
 
     public int getW() {
-        return w;
+        if (bitmap != null) {
+            return bitmap.getWidth();
+        } else {
+            return 0;
+        }
     }
 
-    public void setW(int w) {
-        this.w = w;
-    }
 
     public int getH() {
-        return h;
+        if (bitmap != null) {
+            return bitmap.getHeight();
+        } else {
+            return 0;
+        }
     }
 
-    public void setH(int h) {
-        this.h = h;
-    }
-
-    private int h;
 
     public ZBitmap() {
 
@@ -41,26 +40,12 @@ public class ZBitmap {
         setBitmap(bitmap);
     }
 
-    public int getWidth() {
-        return w;
-    }
-
-    public int getHeight() {
-        return h;
-    }
-
     public Bitmap getBitmap() {
         return bitmap;
     }
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
-        if(bitmap!=null){
-            this.w = bitmap.getWidth();
-            this.h = bitmap.getHeight();
-        }else{
-            S.e("error: bitmap is null!");
-        }
     }
 
 }

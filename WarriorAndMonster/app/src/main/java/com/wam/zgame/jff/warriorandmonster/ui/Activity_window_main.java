@@ -54,9 +54,9 @@ public class Activity_window_main extends Activity_base {
         world.addRoom(room);
         //初始化player
         player = new Player();
-        player.setX(50);
-        player.setY(50);
-        float w = 100;
+        player.setX(200);
+        player.setY(300);
+        float w = 40f;
 
         test_init_pic(Activity_window_main.this);
         player.setRange_x_back_pic(w);
@@ -68,7 +68,7 @@ public class Activity_window_main extends Activity_base {
         player.setRange_y_top_real(w);
         player.setRange_y_bottom_real(w);
         player.setPictures(test_pictures);
-        player.addPose(new Pose(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8}, 9, -1) {
+        player.addPose(new Pose(new int[]{0, 1, 2, 3, 4, 5, 6, 7,8}, 1,"walk") {
             @Override
             protected float getPosibility() {
                 return 1;
@@ -76,7 +76,26 @@ public class Activity_window_main extends Activity_base {
 
             @Override
             protected long getDuring_action() {
-                return 500;
+                return 50;
+            }
+
+            @Override
+            public void onChangeSize(float w, float h) {
+
+            }
+        });
+        player.addPose(new Pose(new int[]{16, 17, 18, 19, 20, 21, 22, 23},  1,"run") {
+            @Override
+            protected float getPosibility() {
+                if(player!=null&&player.isLockControl()){
+                    return -1;
+                }
+                return 10;
+            }
+
+            @Override
+            protected long getDuring_action() {
+                return 50;
             }
 
             @Override
@@ -204,23 +223,23 @@ public class Activity_window_main extends Activity_base {
         test_pictures[23] = new ZBitmap(B.getBitmapById(context, R.drawable.swordman_23));
 //
         test_pictures_goblin = new ZBitmap[17];
-//        test_pictures_goblin[0] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_0);
-//        test_pictures_goblin[1] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_1);
-//        test_pictures_goblin[2] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_2);
-//        test_pictures_goblin[3] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_3);
-//        test_pictures_goblin[4] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_4);
-//        test_pictures_goblin[5] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_5);
-//        test_pictures_goblin[6] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_6);
-//        test_pictures_goblin[7] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_7);
-//        test_pictures_goblin[8] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_8);
-//        test_pictures_goblin[9] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_9);
-//        test_pictures_goblin[10] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_10);
-//        test_pictures_goblin[11] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_11);
-//        test_pictures_goblin[12] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_12);
-//        test_pictures_goblin[13] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_13);
-//        test_pictures_goblin[14] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_14);
-//        test_pictures_goblin[15] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_15);
-//        test_pictures_goblin[16] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_16);
+        test_pictures_goblin[0] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_0));
+        test_pictures_goblin[1] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_1));
+        test_pictures_goblin[2] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_2));
+        test_pictures_goblin[3] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_3));
+        test_pictures_goblin[4] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_4));
+        test_pictures_goblin[5] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_5));
+        test_pictures_goblin[6] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_6));
+        test_pictures_goblin[7] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_7));
+        test_pictures_goblin[8] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_8));
+        test_pictures_goblin[9] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_9));
+        test_pictures_goblin[10] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_10));
+        test_pictures_goblin[11] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_11));
+        test_pictures_goblin[12] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_12));
+        test_pictures_goblin[13] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_13));
+        test_pictures_goblin[14] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_14));
+        test_pictures_goblin[15] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_15));
+        test_pictures_goblin[16] = new ZBitmap(B.getBitmapById(context, R.drawable.goblin_16));
 
     }
 

@@ -13,6 +13,7 @@ import com.wam.zgame.jff.warriorandmonster.tools.ZBitmap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by zhaoyuntao on 2018/5/18.
@@ -88,7 +89,7 @@ public abstract class Element extends GameObject {
         time_during = time_now - time_last;
         float w = 15;
         if (range_x_forward_pic == 0) {
-            range_x_forward_pic = w ;
+            range_x_forward_pic = w;
         }
         if (range_x_back_pic == 0) {
             range_x_back_pic = w;
@@ -157,7 +158,15 @@ public abstract class Element extends GameObject {
      * @param stateOfPose
      */
     public void resetPose(Pose... stateOfPose) {
+        clearPose();
         addPose(stateOfPose);
+    }
+
+    /**
+     * 清空动作
+     */
+    public void clearPose() {
+        list.clear();
     }
 
     /**
@@ -166,7 +175,6 @@ public abstract class Element extends GameObject {
      * @param stateOfPose
      */
     public void addPose(Pose... stateOfPose) {
-        list.clear();
         for (Pose pose : stateOfPose) {
             list.add(pose);
         }
@@ -177,33 +185,60 @@ public abstract class Element extends GameObject {
         ZBitmap bitmap_current = null;
         //计算动作--------------------------------------
         if (pictures != null && pictures.length != 0) {
-            int index = -1;
-            //如果第一次获取pose,默认为0
-            if (this.pose_now == null) {
-                index = 0;
-            } else {
-                index = pose_now.getPicIndex();
+            //如果pose为空,或者上一个pose已经执行完毕,则选取新的pose
+            getPose:
+            if (this.pose_now == null || this.pose_now.isBroken()) {
+                if (list.size() > 0) {
+                    //按照几率选取合适的pose, 取值范围0-100, 0不可能, 100百分之百会触发
+                    float posibility_random = new Random().nextFloat();
+                    float posibility_all = 0;
+                    float posibility_cal = 0;
+                    //得到总权重值
+                    for (Pose pose : list) {
+                        float posibility_pose = pose.getPosibility();
+                        if (posibility_pose == -1) {
+                            pose.reset();
+                            this.pose_now = pose;
+                            break getPose;
+                        }
+                        posibility_all += posibility_pose;
+                    }
+                    S.s("总权重:" + posibility_all);
+                    //计算得随机数所对应的权重值.
+                    float result_random = posibility_random * posibility_all;
+                    S.s("随机权重:" + result_random);
+                    //计算随机权重值落在哪个权重区
+                    for (Pose pose : list) {
+                        float posibility_pose = pose.getPosibility();
+                        S.s("------------------------------------- 当前权重区间[" + posibility_pose + "]:(" + posibility_cal + " - " + (posibility_cal + posibility_pose) + ")");
+                        //如果随机值大于之前累积的权重值总和, 但是小于(之前累积的权重值总和+当前权重值), 说明随机值落在本权重区内
+                        if (result_random > posibility_cal && result_random < (posibility_cal + posibility_pose)) {
+                            pose.reset();
+                            this.pose_now = pose;
+                        }
+                        posibility_cal += posibility_pose;
+                    }
+                } else {
+                    this.pose_now = new Pose(new int[]{0}, -1) {
+                        @Override
+                        protected float getPosibility() {
+                            return 1;
+                        }
+
+                        @Override
+                        protected long getDuring_action() {
+                            return 1000;
+                        }
+
+                        @Override
+                        public void onChangeSize(float w, float h) {
+
+                        }
+                    };
+                }
             }
-            if (list.size() > 0 && index < list.size() && index >= 0) {
-                this.pose_now = list.get(index);
-            } else {
-                this.pose_now = new Pose(new int[]{0}, 1, -1) {
-                    @Override
-                    protected float getPosibility() {
-                        return 1;
-                    }
 
-                    @Override
-                    protected long getDuring_action() {
-                        return 1000;
-                    }
-
-                    @Override
-                    public void onChangeSize(float w, float h) {
-
-                    }
-                };
-            }
+//            S.s("正在执行pose:" + pose_now.getName());
             //获取该图片下标
             int index_pic_now = pose_now.getPicIndex();
             //获取本次应该绘制的bitmap位图
@@ -240,9 +275,10 @@ public abstract class Element extends GameObject {
             int w_pic = bitmap_current.getW();
             int h_pic = bitmap_current.getH();
 
+
             if (w_pic > 0 && h_pic > 0) {
                 //计算图片长宽比
-                float percent = w_pic / h_pic;
+                float percent = (float) w_pic / h_pic;
                 //计算绘制区域的长宽比
                 float w_area_draw = right - left;
                 float h_area_draw = bottom - top;
@@ -251,9 +287,10 @@ public abstract class Element extends GameObject {
                 if (percent < percent_canvas) {
                     w_area_draw = h_area_draw * percent;
                     left = (left + right) / 2 - w_area_draw / 2;
+                    right = left + w_area_draw;
                 } else {
                     h_area_draw = w_area_draw / percent;
-                    top = (top + bottom) / 2 - h_area_draw / 2;
+                    top = bottom - h_area_draw;
                 }
 
                 Rect rect_pic = new Rect();
@@ -262,9 +299,9 @@ public abstract class Element extends GameObject {
                 Rect rect_draw = new Rect();
                 rect_draw.set((int) left, (int) top, (int) right, (int) bottom);
 
-                Bitmap bitmap_draw=bitmap_current.getBitmap();
+                Bitmap bitmap_draw = bitmap_current.getBitmap();
                 if (x_direction == direction_reduce) {
-                    bitmap_draw=B.overTurnBitmap(bitmap_current.getBitmap());
+                    bitmap_draw = B.overTurnBitmap(bitmap_current.getBitmap());
                 }
                 canvas.drawBitmap(bitmap_draw, rect_pic, rect_draw, p);
             }

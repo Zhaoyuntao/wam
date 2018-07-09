@@ -84,6 +84,9 @@ public class Creature extends Element {
         lockControl = false;
     }
 
+    public boolean isLockControl(){
+        return lockControl;
+    }
     private int test_time_random_run = 0;
 
     /**
